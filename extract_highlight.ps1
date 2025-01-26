@@ -36,7 +36,7 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
             continue demoloop  
         }      
     } 
-    else {
+    else { # file name format is not valid
         Write-Output "Skipping $($file.Name.Replace('.dm_68',''))..."
         continue demoloop
     }
@@ -51,10 +51,50 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
             $endtime   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
 
             .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
-
             $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-            $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
-        }
+
+            # Select what to do
+            $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+            Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+
+            $q3e_args = @(
+                "+set fs_game $gamename",
+                '+set nextdemo quit',
+                '+set in_nograb 1',
+                '+bind c quit',
+                '+demo highlight_preview'
+            )
+
+            Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' <#'4 - adjust timing'#> 'c - Quit'
+            :decisionLoop do {
+                Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
+                
+                do {
+                    $selection = Read-Host -Prompt 'Select action'
+                } while ( -not (('1','2','3','c').Contains($selection)))
+            
+                switch($selection) {
+                    '1' { # Keep - Move file to output folder
+                        $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
+                        break decisionLoop
+                    }
+                    '2' { # Delete -  Delete the clip file
+                        Remove-Item $clipfile.FullName
+                        break decisionLoop
+                    }
+                    '3' { # Do Nothing - decisionLoop will play the demo again
+                    }
+                    '4' { # Adjust Timing
+                        # Not yet implemented 
+                    }
+                    'c' { # Quit - clean up and exit
+                        Remove-Item $clipfile.FullName
+                        Remove-Item "$q3installdir\$gamename\demos\highlight_preview.dm_68"
+                        exit 
+                    }
+                }
+            } while ($true)
+        } 
     }
 }
 pause
