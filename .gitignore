@@ -1,9 +1,12 @@
 baseq3/demos/
 baseq3/qconsole.log
 
-input/
-output/
+rename/
+highlight/
+
+serverdemo/
 records/
+
 zz_tools/
 
 quake3e.ded.x64.exe

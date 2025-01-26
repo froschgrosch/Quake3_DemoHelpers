@@ -1,4 +1,4 @@
-$inputFiles = Get-ChildItem -Depth 2 .\input | where -Property Extension -EQ '.rec'
+$inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | where -Property Extension -EQ '.rec'
 
 foreach ($f in $inputFiles){
   $name = $f.Name 
@@ -55,14 +55,14 @@ foreach ($file in Get-ChildItem .\records){
 
             Write-Output "Player: $player" "Map: $map" $newname ' '
             
-            if (-not $(Test-Path ".\output\$player\")){
-                New-Item -Path ".\output\" -Name $player -ItemType "directory"
+            if (-not $(Test-Path ".\serverdemo\output\$player\")){
+                New-Item -Path ".\serverdemo\output\" -Name $player -ItemType "directory"
             }            
 
 
             if ($true) #$player -eq 'froschgrosch')
             {
-                $file = Move-Item -Force .\baseq3\demos\output.dm_68 ".\output\$player\$newname.dm_68" -PassThru         
+                $file = Move-Item -Force .\baseq3\demos\output.dm_68 ".\serverdemo\output\$player\$newname.dm_68" -PassThru         
                 $file.LastWriteTime = $date
 
             } else {
