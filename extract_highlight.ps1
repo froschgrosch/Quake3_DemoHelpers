@@ -9,9 +9,15 @@ function Format-ServerTime ($t) {
     return "$min`:$sec"
 }
 
+# check if output folder is empty - exit otherwise
+if (Test-Path -Path .\highlight\output\*.dm_68){
+    Write-Output 'Error: Output folder is not empty!'
+    Pause
+    exit
+}
+
 #Read config file
 $config = Get-Content .\zz_config\highlights\config.json | ConvertFrom-Json
-
 $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extension -EQ '.dm_68'
 
 :demoloop foreach ($file in $inputFiles) {
@@ -97,8 +103,17 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
             Remove-Item "$q3installdir\$gamename\demos\highlight_preview.dm_68"
         }
     }
-}                       
+} 
+
+# add temp prefixes to demo files
+$outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extension -EQ '.dm_68'
+$index = 1
+foreach ($demo in $outputDemos) {
+    # check file name
+    if ($demo.Name -match '\d{4}(?:-\d{2}){2}_\d{2}(?:-\d{2}){2}_\w*_\w*(?:_\d+){2}.dm_68'){ # quite horrendous :/
+        Rename-Item -Path $demo.FullName -NewName $('c{0:d3}_{1}' -f $index, $demo.Name)
+        $index++
+    }
+}
 Write-Output 'Demo processing is finished.'
-
-
 pause
