@@ -50,7 +50,7 @@ foreach ($f in $inputFiles){
             #Wait-Process -Name "UDT_json"
             #pause
 
-            $player = $udtoutput.demoTakerCleanName.Replace('LPG ','')
+            $player = $udtoutput.demoTakerCleanName.Replace('LPG ','').Replace(' ','')
             $map = $udtoutput.configStringValues.mapname
 
             $date = Get-Date -Year $name.Substring(0,4) -Month $name.Substring(5,2) -Day $name.Substring(8,2) -Hour $name.Substring(11,2) -Minute $name.Substring(14,2) -Second $name.Substring(17,2)
@@ -78,4 +78,5 @@ foreach ($f in $inputFiles){
         }
     }
 }
+Get-ChildItem .\records\ | Where-Object -Property Extension -EQ '.rec' | Remove-Item
 pause
