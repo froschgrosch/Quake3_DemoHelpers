@@ -1,0 +1,14 @@
+{
+    "players": [
+        { 
+            "names": ["froschgrosch", "LPG froschgrosch"],
+            "demoMarkers": [ "y", "burt, please mArKdEmO"]
+        }, {
+            "name": ["NamedPlayer", "LPG NamedPlayer" ],
+            "demoMarkers": [ "bekommenSieGicht" ]
+        }
+    ],
+    "settings": {
+        "defaultOffset": { "start": 10, "end": 10 }
+    }
+}
