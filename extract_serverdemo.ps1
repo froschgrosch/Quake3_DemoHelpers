@@ -1,4 +1,4 @@
-$inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | where -Property Extension -EQ '.rec'
+$inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 
 foreach ($f in $inputFiles){
   $name = $f.Name 
@@ -8,11 +8,16 @@ foreach ($f in $inputFiles){
   Copy-Item -Path $f.FullName -Destination .\records\$newName
 }
 
-# Convert to single-pov demos
-foreach ($file in Get-ChildItem .\records){
-    $name = $file.Name.Replace('.rec','')
-    #echo $name
+:demoloop foreach ($file in Get-ChildItem .\records){
+    if ($file.Name -match '(?:\d{2}-){3}\w*\.rec'){ # check file name
+        $name = $file.Name.Replace('.rec','')
+    } 
+    else {
+        Write-Output "Skipping $($file.Name)..."
+        continue demoloop
+    }
 
+    # Scan server-side demo file
     .\quake3e.ded.x64.exe `
     +set logfile 2 `
     +record_scan $name `
@@ -30,7 +35,7 @@ foreach ($file in Get-ChildItem .\records){
 
             Write-Output "Client $client Instance $instance"
            
-            # convert demo
+            # Convert to single-pov demos
             .\quake3e.ded.x64.exe `
             +set logfile 0 `
             +set sv_recordConvertSimulateFollow 0 `
