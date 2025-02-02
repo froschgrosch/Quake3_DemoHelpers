@@ -105,6 +105,9 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
     }
 } 
 
+# unbind c
+Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -WindowStyle Minimized -ArgumentList @("+set fs_game $gamename", '+unbind c', '+quit')  
+
 # add temp prefixes to demo files
 $outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extension -EQ '.dm_68'
 $index = 1
