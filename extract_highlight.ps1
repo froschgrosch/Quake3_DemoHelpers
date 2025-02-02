@@ -71,13 +71,13 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
                 '+demo highlight_preview'
             )
 
-            Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' <#'4 - adjust timing'#> 'c - Quit'
+            Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' '4 - Adjust start' '5 - Adjust end' 'c - Quit'
             :decisionLoop do {
                 Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
                 
                 do {
                     $selection = Read-Host -Prompt 'Select action'
-                } while ( -not (('1','2','3','c').Contains($selection)))
+                } while ( -not (('1','2','3','4','5','c').Contains($selection)))
             
                 switch($selection) {
                     '1' { # Keep - Move file to output folder
@@ -88,10 +88,29 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
                         Remove-Item $clipfile.FullName
                         break decisionLoop
                     }
-                    '3' { # Do Nothing - decisionLoop will play the demo again
+                    '3' { # Watch again
+                        <# Do Nothing - decisionLoop will play the demo again #>
                     }
-                    '4' { # Adjust Timing
-                        # Not yet implemented 
+                    '4' { # Adjust start
+                        $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
+                        $starttime += $selection
+
+                        Remove-Item $clipfile.FullName
+                        .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
+                        $clipfile = Get-ChildItem .\highlight\temp -Depth 1
+                        $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+                        Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+            
+                    }
+                    '5' { # Adjust end
+                        $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
+                        $endtime += $selection
+                        
+                        Remove-Item $clipfile.FullName
+                        .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
+                        $clipfile = Get-ChildItem .\highlight\temp -Depth 1
+                        $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+                        Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
                     }
                     'c' { # Quit - clean up and exit
                         Remove-Item $clipfile.FullName # clip in temp folder
