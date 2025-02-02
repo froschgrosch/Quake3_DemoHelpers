@@ -95,12 +95,12 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
                     }
                     'c' { # Quit - clean up and exit
                         Remove-Item $clipfile.FullName # clip in temp folder
-                        Remove-Item "$q3installdir\$gamename\demos\highlight_preview.dm_68"
+                        Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
                         exit 
                     }
                 }
             } while ($true)
-            Remove-Item "$q3installdir\$gamename\demos\highlight_preview.dm_68"
+            Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
         }
     }
 } 
