@@ -99,8 +99,16 @@ $swappedConfigFiles = @()
                 } while ( -not (('1','2','3','4','5','c').Contains($selection)))
             
                 switch($selection) {
-                    '1' { # Keep - Move file to output folder
-                        $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
+                    '1' { # Keep - Add suffix and move file to output folder
+                        $newName = ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
+
+                        $suffix = Read-Host -Prompt 'Enter new suffix (optional)'
+                        if ($suffix.Length -gt 0){
+                            $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
+                        }
+
+                        $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination $newName
+                        
                         break decisionLoop
                     }
                     '2' { # Delete -  Delete the clip file
@@ -156,7 +164,7 @@ $outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extensi
 $index = 1
 foreach ($demo in $outputDemos) {
     # check file name
-    if ($demo.Name -match '\d{4}(?:-\d{2}){2}_\d{2}(?:-\d{2}){2}_\w*_\w*(?:_\d+){2}.dm_68'){ # quite horrendous :/
+    if ($demo.Name -match '\d{4}(?:-\d{2}){2}_\d{2}(?:-\d{2}){2}_\w*_\w*(?:_\d+){2}\w*.dm_68'){ # quite horrendous :/
         Rename-Item -Path $demo.FullName -NewName $('c{0:d3}_{1}' -f $index, $demo.Name)
         $index++
     }
