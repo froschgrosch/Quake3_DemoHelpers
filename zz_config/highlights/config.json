@@ -13,6 +13,7 @@
         "q3install" : {
             "path": "C:\\Programme2\\Quake3_v7_4",
             "executable" : "quake3e.x64.exe"
-        }
+        },
+        "configSwapping": true
     }
 }

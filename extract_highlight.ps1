@@ -9,6 +9,15 @@ function Format-ServerTime ($t) {
     return "$min`:$sec"
 }
 
+function Clear-SwappedConfigFiles {
+    foreach ($gamename in $swappedConfigFiles){
+        if (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak"){
+            Remove-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg"
+            Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak" -NewName 'q3config.cfg'
+        }    
+    }
+}
+
 # check if output folder is empty - exit otherwise
 if (Test-Path -Path .\highlight\output\*.dm_68){
     Write-Output 'Error: Output folder is not empty!'
@@ -19,6 +28,9 @@ if (Test-Path -Path .\highlight\output\*.dm_68){
 #Read config file
 $config = Get-Content .\zz_config\highlights\config.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extension -EQ '.dm_68'
+
+# Install playback config 
+$swappedConfigFiles = @()
 
 :demoloop foreach ($file in $inputFiles) {
     # check file name
@@ -59,6 +71,15 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
             .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
             $clipfile = Get-ChildItem .\highlight\temp -Depth 1
 
+            # Swap config file in if necessary
+            if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
+                if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
+                    Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg" -NewName 'q3config.cfg.bak'
+                    Copy-Item -Path ".\zz_config\highlights\q3cfg\$gamename.cfg" -Destination "$($config.settings.q3install.path)\$gamename\q3config.cfg"
+                }
+                $swappedConfigFiles += $gamename
+            }    
+            
             # Select what to do
             $gamename = $udtoutput.gameStates[0].configStringValues.gamename
             Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
@@ -66,8 +87,6 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
             $q3e_args = @(
                 "+set fs_game $gamename",
                 '+set nextdemo quit',
-                '+set in_nograb 1',
-                '+bind c quit',
                 '+demo highlight_preview'
             )
 
@@ -113,8 +132,13 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
                         Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
                     }
                     'c' { # Quit - clean up and exit
-                        Remove-Item $clipfile.FullName # clip in temp folder
+
+                        # Delete clip in temp folder
+                        Remove-Item $clipfile.FullName 
                         Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+
+                        Clear-SwappedConfigFiles
+                        
                         exit 
                     }
                 }
@@ -124,8 +148,8 @@ $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extensio
     }
 } 
 
-# unbind c
-Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -WindowStyle Minimized -ArgumentList @("+set fs_game $gamename", '+unbind c', '+quit')  
+# put back old config
+Clear-SwappedConfigFiles
 
 # add temp prefixes to demo files
 $outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extension -EQ '.dm_68'
