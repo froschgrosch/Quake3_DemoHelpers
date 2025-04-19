@@ -73,6 +73,8 @@ $swappedConfigFiles = @()
             .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
             $clipfile = Get-ChildItem .\highlight\temp -Depth 1
 
+            $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+
             # Swap config file in if necessary
             if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
                 if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
@@ -82,16 +84,15 @@ $swappedConfigFiles = @()
                 $swappedConfigFiles += $gamename
             }    
             
-            # Select what to do
-            $gamename = $udtoutput.gameStates[0].configStringValues.gamename
             Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
-
+            
             $q3e_args = @(
                 "+set fs_game $gamename",
                 '+set nextdemo quit',
                 '+demo highlight_preview'
             )
 
+            # Select what to do
             Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' '4 - Adjust start' '5 - Adjust end' 'c - Quit'
             :decisionLoop do {
                 Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
