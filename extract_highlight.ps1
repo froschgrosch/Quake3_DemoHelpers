@@ -105,7 +105,11 @@ $swappedConfigFiles = @()
                     '1' { # Keep - Add suffix and move file to output folder
                         $newName = ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
 
-                        $suffix = Read-Host -Prompt 'Enter new suffix (optional)'
+                        # Validate suffix - only lowercase letters, digits and underscores are allowed
+                        do {
+                            $suffix = Read-Host -Prompt 'Enter new suffix (optional)' 
+                        } while (-not ($suffix -match '^[a-z0-9_]+$' -or $suffix -eq ''))
+                        
                         if ($suffix.Length -gt 0){
                             $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
                         }
