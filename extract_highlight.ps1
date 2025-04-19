@@ -10,11 +10,13 @@ function Format-ServerTime ($t) {
 }
 
 function Clear-SwappedConfigFiles {
-    foreach ($gamename in $swappedConfigFiles){
-        if (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak"){
-            Remove-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg"
-            Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak" -NewName 'q3config.cfg'
-        }    
+    if ($config.settings.configSwapping){
+        foreach ($gamename in $swappedConfigFiles){
+            if (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak"){
+                Remove-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg"
+                Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak" -NewName 'q3config.cfg'
+            }    
+        }
     }
 }
 
