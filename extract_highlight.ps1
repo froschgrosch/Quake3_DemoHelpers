@@ -115,7 +115,6 @@ $swappedConfigFiles = @()
                         }
 
                         $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination $newName
-                        
                         break decisionLoop
                     }
                     '2' { # Delete -  Delete the clip file
@@ -134,7 +133,6 @@ $swappedConfigFiles = @()
                         $clipfile = Get-ChildItem .\highlight\temp -Depth 1
                         $gamename = $udtoutput.gameStates[0].configStringValues.gamename
                         Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
-            
                     }
                     '5' { # Adjust end
                         $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
