@@ -20,6 +20,14 @@ function Clear-SwappedConfigFiles {
     }
 }
 
+function Get-ClipFile ($s, $e, $f, $g){
+    .\zz_tools\UDT_cutter.exe t -q -s="$s" -e="$e" -o="..\highlight\temp" ..\highlight\input\$f
+    $cf = Get-ChildItem .\highlight\temp -Depth 1
+    Copy-Item -Force $cf.FullName -Destination "$($config.settings.q3install.path)\$g\demos\highlight_preview.dm_68"
+
+    return $cf
+}
+
 # check if output folder is empty - exit otherwise
 if (Test-Path -Path .\highlight\output\*.dm_68){
     Write-Output 'Error: Output folder is not empty!'
@@ -72,8 +80,7 @@ $swappedConfigFiles = @()
             $starttime = [Math]::floor($message.serverTime / 1000 - $config.settings.defaultOffset.start)
             $endtime   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
 
-            .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
-            $clipfile = Get-ChildItem .\highlight\temp -Depth 1
+            $clipfile = Get-ClipFile $starttime $endtime $file $gamename
 
             # Swap config file in if necessary
             if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
@@ -82,9 +89,7 @@ $swappedConfigFiles = @()
                     Copy-Item -Path ".\zz_config\highlights\q3cfg\$gamename.cfg" -Destination "$($config.settings.q3install.path)\$gamename\q3config.cfg"
                 }
                 $swappedConfigFiles += $gamename
-            }    
-            
-            Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+            }
             
             $q3e_args = @(
                 "+set fs_game $gamename",
@@ -114,7 +119,7 @@ $swappedConfigFiles = @()
                             $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
                         }
 
-                        $clipfile = Move-Item -Force -PassThru $clipfile.FullName -Destination $newName
+                        Move-Item -Force -PassThru $clipfile.FullName -Destination $newName
                         break decisionLoop
                     }
                     '2' { # Delete -  Delete the clip file
@@ -129,18 +134,14 @@ $swappedConfigFiles = @()
                         $starttime += $selection
 
                         Remove-Item $clipfile.FullName
-                        .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
-                        $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-                        Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+                        $clipfile = Get-ClipFile $starttime $endtime $file $gamename
                     }
                     '5' { # Adjust end
                         $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
                         $endtime += $selection
                         
                         Remove-Item $clipfile.FullName
-                        .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
-                        $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-                        Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+                        $clipfile = Get-ClipFile $starttime $endtime $file $gamename
                     }
                     'c' { # Quit - clean up and exit
 
