@@ -80,6 +80,13 @@ $swappedConfigFiles = @()
         $swappedConfigFiles += $gamename
     }
 
+    # Set Quake3e arguments
+    $q3e_args = @(
+        "+set fs_game $gamename",
+        '+set nextdemo quit',
+        '+demo highlight_preview'
+    )
+
     foreach ($message in $udtoutput.chat) {
         # check if message is from correct player and has the correct content
         if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
@@ -90,12 +97,6 @@ $swappedConfigFiles = @()
             $endtime   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
 
             $clipfile = Get-ClipFile $starttime $endtime $file $gamename
-  
-            $q3e_args = @(
-                "+set fs_game $gamename",
-                '+set nextdemo quit',
-                '+demo highlight_preview'
-            )
 
             # Select what to do
             Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' '4 - Adjust start' '5 - Adjust end' 'c - Quit'
