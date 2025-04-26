@@ -4,8 +4,11 @@
             "names": ["froschgrosch", "LPG froschgrosch"],
             "demoMarkers": [ "y", "burt, please mArKdEmO"]
         }, {
-            "name": ["NamedPlayer", "LPG NamedPlayer" ],
+            "names": ["NamedPlayer", "LPG NamedPlayer" ],
             "demoMarkers": [ "bekommenSieGicht" ]
+        }, {
+            "names": ["Da_Schumi", "LPG Da_Schumi" ],
+            "demoMarkers": [ "l" ]
         }
     ],
     "settings": {
