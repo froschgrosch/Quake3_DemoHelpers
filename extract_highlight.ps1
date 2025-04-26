@@ -61,6 +61,8 @@ $swappedConfigFiles = @()
         continue demoloop
     }
 
+    $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+
     foreach ($message in $udtoutput.chat) {
         # check if message is from correct player and has the correct content
         if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
@@ -72,8 +74,6 @@ $swappedConfigFiles = @()
 
             .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
             $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-
-            $gamename = $udtoutput.gameStates[0].configStringValues.gamename
 
             # Swap config file in if necessary
             if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
@@ -131,7 +131,6 @@ $swappedConfigFiles = @()
                         Remove-Item $clipfile.FullName
                         .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
                         $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-                        $gamename = $udtoutput.gameStates[0].configStringValues.gamename
                         Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
                     }
                     '5' { # Adjust end
@@ -141,7 +140,6 @@ $swappedConfigFiles = @()
                         Remove-Item $clipfile.FullName
                         .\zz_tools\UDT_cutter.exe t -q -s="$starttime" -e="$endtime" -o="..\highlight\temp" ..\highlight\input\$file
                         $clipfile = Get-ChildItem .\highlight\temp -Depth 1
-                        $gamename = $udtoutput.gameStates[0].configStringValues.gamename
                         Copy-Item -Force $clipfile.FullName -Destination "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
                     }
                     'c' { # Quit - clean up and exit
