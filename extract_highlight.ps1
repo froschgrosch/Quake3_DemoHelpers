@@ -120,7 +120,7 @@ $swappedConfigFiles = @()
                             $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
                         }
 
-                        Move-Item -Force -PassThru $clipfile.FullName -Destination $newName
+                        Move-Item -Force $clipfile.FullName -Destination $newName
                         break decisionLoop
                     }
                     '2' { # Delete -  Delete the clip file
