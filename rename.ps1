@@ -3,7 +3,7 @@ $inputFiles = Get-ChildItem  .\rename\input | Where-Object -Property Extension -
 :renameloop foreach ($file in $inputFiles) {
     Write-Output "Old: $($file.Name.Replace('.dm_68',''))"
     switch -Regex ($file.Name) { # extract timestamp from filename
-        '\d{14}-\S*-\w*\.dm_68' # quake3e-named
+        '\d{14}-\S+\.\d+-[\w-]+\.dm_68' # quake3e-named
         { 
             $year   = $file.name.Substring(0,4)
             $month  = $file.name.Substring(4,2)

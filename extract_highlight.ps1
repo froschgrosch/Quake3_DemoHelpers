@@ -44,7 +44,7 @@ $swappedConfigFiles = @()
 
 :demoloop foreach ($file in $inputFiles) {
     # check file name
-    if ($file.Name -match '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]*_\w*.dm_68'){ 
+    if ($file.Name -match '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]+_\w+.dm_68'){ 
         Write-Output ' ' "Selecting $($file.Name.Replace('.dm_68',''))..."
 
         # check if player is in the config file
@@ -168,7 +168,7 @@ $outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extensi
 $index = 1
 foreach ($demo in $outputDemos) {
     # check file name
-    if ($demo.Name -match '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]*_\w*_\d+_\d+\w*\.dm_68'){ # quite horrendous :/
+    if ($demo.Name -match '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]+_\w+_\d+_\d+\w*\.dm_68'){ # quite horrendous :/
         Rename-Item -Path $demo.FullName -NewName $('c{0:d3}_{1}' -f $index, $demo.Name)
         $index++
     }

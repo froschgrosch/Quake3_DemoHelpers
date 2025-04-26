@@ -9,7 +9,7 @@ foreach ($f in $inputFiles){
 }
 
 :demoloop foreach ($file in Get-ChildItem .\records){
-    if ($file.Name -match '(?:\d{2}-){3}\w*\.rec'){ # check file name
+    if ($file.Name -match '(?:\d{2}-){3}[\w-]+\.rec'){ # check file name
         $name = $file.Name.Replace('.rec','')
     } 
     else {
