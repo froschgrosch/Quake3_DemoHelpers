@@ -71,6 +71,15 @@ $swappedConfigFiles = @()
 
     $gamename = $udtoutput.gameStates[0].configStringValues.gamename
 
+    # Swap config file in if necessary
+    if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
+        if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
+            Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg" -NewName 'q3config.cfg.bak'
+            Copy-Item -Path ".\zz_config\highlights\q3cfg\$gamename.cfg" -Destination "$($config.settings.q3install.path)\$gamename\q3config.cfg"
+        }
+        $swappedConfigFiles += $gamename
+    }
+
     foreach ($message in $udtoutput.chat) {
         # check if message is from correct player and has the correct content
         if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
@@ -81,16 +90,7 @@ $swappedConfigFiles = @()
             $endtime   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
 
             $clipfile = Get-ClipFile $starttime $endtime $file $gamename
-
-            # Swap config file in if necessary
-            if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
-                if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
-                    Rename-Item -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg" -NewName 'q3config.cfg.bak'
-                    Copy-Item -Path ".\zz_config\highlights\q3cfg\$gamename.cfg" -Destination "$($config.settings.q3install.path)\$gamename\q3config.cfg"
-                }
-                $swappedConfigFiles += $gamename
-            }
-            
+  
             $q3e_args = @(
                 "+set fs_game $gamename",
                 '+set nextdemo quit',
