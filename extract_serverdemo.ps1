@@ -1,3 +1,9 @@
+function Invoke-Quake3e ($q3e_args) {
+    $q3e_args += '+quit'
+
+    Start-Process -FilePath .\quake3e.ded.x64.exe -Wait -ArgumentList $q3e_args -WindowStyle Minimized
+}
+
 $inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 
 foreach ($f in $inputFiles){
@@ -18,13 +24,8 @@ foreach ($f in $inputFiles){
     }
 
     # Scan server-side demo file
-    .\quake3e.ded.x64.exe `
-    +set logfile 2 `
-    +record_scan $name `
-    +quit
-
-    Wait-Process -Name "quake3e.ded.x64"
-
+    Invoke-Quake3e @('+set logfile 2',"+record_scan $name")
+ 
     $text = Get-Content .\baseq3\qconsole.log
     :lineloop foreach ($line in $text){
         if ($line -match 'client\(\d+\)\ instance\(\d+\)') { # line found
@@ -35,14 +36,7 @@ foreach ($f in $inputFiles){
 
             Write-Output "Client $client Instance $instance"
            
-            # Convert to single-pov demos
-            .\quake3e.ded.x64.exe `
-            +set logfile 0 `
-            +set sv_recordConvertSimulateFollow 0 `
-            +record_convert $name $client $instance `
-            +quit
-
-            Wait-Process -Name "quake3e.ded.x64"
+            Invoke-Quake3e @('+set logfile 0','+set sv_recordConvertSimulateFollow 0',"+record_convert $name $client $instance")
 
             if ($(Get-ItemProperty -Path .\baseq3\demos\output.dm_68 | Select-Object -ExpandProperty Length) -eq 0) { continue :lineloop }
 
@@ -69,7 +63,6 @@ foreach ($f in $inputFiles){
             {
                 $file = Move-Item -Force .\baseq3\demos\output.dm_68 ".\serverdemo\output\$player\$newname.dm_68" -PassThru         
                 $file.LastWriteTime = $date
-
             } else {
                 Remove-Item .\baseq3\demos\output.dm_68
             }
