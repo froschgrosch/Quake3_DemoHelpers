@@ -3,10 +3,10 @@
         "names": ["froschgrosch", "LPG froschgrosch", "LPG froschgro"],
         "demoMarkers": [ "y", "burt, please mArKdEmO"]
     }, {
-        "names": ["NamedPlayer", "LPG NamedPlayer" ],
+        "names": ["NamedPlayer", "LPG NamedPlayer", "LPG NamedPlay" ],
         "demoMarkers": [ "bekommenSieGicht" ]
     }, {
-        "names": ["Da_Schumi", "LPG Da_Schumi" ],
+        "names": ["Da_Schumi", "LPG Da_Schumi", "LPG Da_Schum" ],
         "demoMarkers": [ "l" ]
     }
 ]
