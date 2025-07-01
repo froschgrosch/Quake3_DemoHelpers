@@ -1,3 +1,4 @@
+$players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem  .\rename\input | Where-Object -Property Extension -EQ '.dm_68'
 
 :renameloop foreach ($file in $inputFiles) {
@@ -14,7 +15,7 @@ $inputFiles = Get-ChildItem  .\rename\input | Where-Object -Property Extension -
         }
         
         Default {
-            Write-Output "Skipping $($file.Name.Replace('.dm_68',''))..."
+            Write-Output 'Filename style not supported!' "Skipping $($file.Name.Replace('.dm_68',''))..." ' '
             continue renameloop
         }
     }
@@ -23,7 +24,21 @@ $inputFiles = Get-ChildItem  .\rename\input | Where-Object -Property Extension -
         
     $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c "..\rename\input\$file" | ConvertFrom-Json).gamestates[0]
 
-    $player = $udtoutput.demoTakerCleanName.Replace('LPG ','')
+    #$player = $udtoutput.demoTakerCleanName.Replace('LPG ','')
+    $playerFound = $false
+    foreach ($p in $players){
+        if ($p.names -contains $udtoutput.demoTakerCleanName) {
+            #Write-Output "Selecting player $($p.names[0])..."
+            $player = $p.names[0]
+            $playerFound = $true
+        }
+    } 
+
+    if (-not $playerFound) {
+        Write-Output 'Player not found in config file!' "Skipping $($file.Name.Replace('.dm_68',''))..." ' '
+        continue renameloop
+    } 
+
     $map = $udtoutput.configStringValues.mapname
 
     $newname = "$year-$month-$day`_$hour-$minute-$second`_$map`_$player"
