@@ -35,8 +35,12 @@ if (Test-Path -Path .\highlight\output\*.dm_68){
     exit
 }
 
-#Read config file
-$config = Get-Content .\zz_config\highlights\config.json | ConvertFrom-Json
+# Read config files
+$config = New-Object -TypeName PSObject
+Add-Member -InputObject $config -MemberType NoteProperty -Name 'players' -Value (Get-Content .\zz_config\players.json | ConvertFrom-Json)
+Add-Member -InputObject $config -MemberType NoteProperty -Name 'settings' -Value (Get-Content .\zz_config\highlights\settings.json | ConvertFrom-Json)
+
+# Get demos
 $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extension -EQ '.dm_68'
 
 # Install playback config 
