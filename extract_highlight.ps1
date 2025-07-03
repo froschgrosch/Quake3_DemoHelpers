@@ -51,22 +51,14 @@ $swappedConfigFiles = @()
     if ($file.Name -match '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]+_\w+.dm_68'){ 
         Write-Output ' ' "Selecting $($file.Name.Replace('.dm_68',''))..."
 
-        # check if player is in the config file
         $udtoutput = $(.\zz_tools\UDT_json.exe -a=mg -c "..\highlight\input\$file" | ConvertFrom-Json)
         
-        $playerFound = $false
-        foreach ($p in $config.players){
-            if ($p.names -contains $udtoutput.gamestates[0].demoTakerCleanName) {
-                #Write-Output "Selecting player $($p.names[0])..."
-                $player = $p 
-                $playerFound = $true
-            }
-        } 
-
-        if (-not $playerFound) {
+        # check if player is in the config file
+        $player = $config.players | Where-Object -Property names -CContains $udtoutput.gamestates[0].demoTakerCleanName
+        if ($null -eq $player) {
             Write-Output 'Player not found in config file!' ' '
             continue demoloop  
-        }      
+        }
     } 
     else { # file name format is not valid
         Write-Output "Skipping $($file.Name.Replace('.dm_68',''))..."
