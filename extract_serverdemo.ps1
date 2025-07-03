@@ -72,4 +72,5 @@ foreach ($f in $inputFiles){
     }
 }
 Get-ChildItem .\records\ | Where-Object -Property Extension -EQ '.rec' | Remove-Item
+Remove-Item .\baseq3\qconsole.log
 pause
