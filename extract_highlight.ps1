@@ -28,6 +28,20 @@ function Get-ClipFile ($s, $e, $f, $g){
     return $cf
 }
 
+function Get-UserInput{
+    Param (
+        [Parameter(Mandatory=$true)] [String]$prompt, # Prompt to be displayed
+        [Parameter(Mandatory=$true)] [String]$rgx,    # Regex that needs to be matched
+        [Parameter(Mandatory=$false)] $allowEmpty = $false
+    )
+
+    do {
+        $userinput = Read-Host -Prompt $prompt
+    } while (-not ($userinput -match $rgx -or ($userinput -eq '' -and $allowEmpty)))
+    
+    return $userinput
+}
+
 # check if output folder is empty - exit otherwise
 if (Test-Path -Path .\highlight\output\*.dm_68){
     Write-Output 'Error: Output folder is not empty!'
@@ -99,18 +113,13 @@ $swappedConfigFiles = @()
             :decisionLoop do {
                 Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
                 
-                do {
-                    $selection = Read-Host -Prompt 'Select action'
-                } while ( -not (('1','2','3','4','5','c').Contains($selection)))
-            
+                $selection = Get-UserInput 'Select action' '^[1-5|c]$'
                 switch($selection) {
                     '1' { # Keep - Add suffix and move file to output folder
                         $newName = ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
 
                         # Validate suffix - only lowercase letters, digits and underscores are allowed
-                        do {
-                            $suffix = Read-Host -Prompt 'Enter new suffix (optional)' 
-                        } while (-not ($suffix -match '^[a-z0-9_]+$' -or $suffix -eq ''))
+                        $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty $true
                         
                         if ($suffix.Length -gt 0){
                             $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
@@ -127,14 +136,14 @@ $swappedConfigFiles = @()
                         <# Do Nothing - decisionLoop will play the demo again #>
                     }
                     '4' { # Adjust start
-                        $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
+                        $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
                         $starttime += $selection
 
                         Remove-Item $clipfile.FullName
                         $clipfile = Get-ClipFile $starttime $endtime $file $gamename
                     }
                     '5' { # Adjust end
-                        $selection = [int]$(Read-Host -Prompt 'Enter Value (+ = later, - = earlier)') # todo - input sanitization?
+                        $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
                         $endtime += $selection
                         
                         Remove-Item $clipfile.FullName
