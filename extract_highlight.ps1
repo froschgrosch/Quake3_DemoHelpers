@@ -164,6 +164,9 @@ $swappedConfigFiles = @()
             Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
         }
     } # messageLoop
+
+    # move demo file when finished
+    Move-Item $file.FullName -Destination ".\highlight\output\demo\$($file.Name)"
 } # demoLoop 
 
 # put back old config
