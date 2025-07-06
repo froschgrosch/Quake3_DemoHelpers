@@ -43,7 +43,7 @@ function Get-UserInput{
 }
 
 # check if output folder is empty - exit otherwise
-if (Test-Path -Path .\highlight\output\clip\*.dm_68){
+if (Test-Path -Path .\highlight\output_clip\*.dm_68){
     Write-Output 'Error: Output folder is not empty!'
     Pause
     exit
@@ -116,7 +116,7 @@ $swappedConfigFiles = @()
                 $selection = Get-UserInput 'Select action' '^[1-5|c]$'
                 switch($selection) {
                     '1' { # Keep - Add suffix and move file to output folder
-                        $newName = ".\highlight\output\clip\$($clipfile.Name.Replace('_CUT',''))"
+                        $newName = ".\highlight\output_clip\$($clipfile.Name.Replace('_CUT',''))"
 
                         # Validate suffix - only lowercase letters, digits and underscores are allowed
                         $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty $true
@@ -166,14 +166,14 @@ $swappedConfigFiles = @()
     } # messageLoop
 
     # move demo file when finished
-    Move-Item $file.FullName -Destination ".\highlight\output\demo\$($file.Name)"
+    Move-Item $file.FullName -Destination ".\highlight\output_demo\$($file.Name)"
 } # demoLoop 
 
 # put back old config
 Clear-SwappedConfigFiles
 
 # add temp prefixes to demo files
-$outputDemos = Get-ChildItem .\highlight\output\clip | Where-Object -Property Extension -EQ '.dm_68'
+$outputDemos = Get-ChildItem .\highlight\output_clip | Where-Object -Property Extension -EQ '.dm_68'
 $index = 1
 foreach ($demo in $outputDemos) {
     # check file name
