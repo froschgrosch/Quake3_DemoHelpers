@@ -18,9 +18,12 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |
 |---highlight/
 |   |
+|   |---temp/
 |   |---input/
 |   |---output/
-|   |---temp/
+|       |
+|       |---clip/
+|       |---demo/
 |
 |
 |---rename/

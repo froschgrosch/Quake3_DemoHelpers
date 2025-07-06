@@ -43,7 +43,7 @@ function Get-UserInput{
 }
 
 # check if output folder is empty - exit otherwise
-if (Test-Path -Path .\highlight\output\*.dm_68){
+if (Test-Path -Path .\highlight\output\clip\*.dm_68){
     Write-Output 'Error: Output folder is not empty!'
     Pause
     exit
@@ -116,7 +116,7 @@ $swappedConfigFiles = @()
                 $selection = Get-UserInput 'Select action' '^[1-5|c]$'
                 switch($selection) {
                     '1' { # Keep - Add suffix and move file to output folder
-                        $newName = ".\highlight\output\$($clipfile.Name.Replace('_CUT',''))"
+                        $newName = ".\highlight\output\clip\$($clipfile.Name.Replace('_CUT',''))"
 
                         # Validate suffix - only lowercase letters, digits and underscores are allowed
                         $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty $true
@@ -160,17 +160,17 @@ $swappedConfigFiles = @()
                         exit 
                     }
                 }
-            } while ($true)
+            } while ($true) # :decisionLoop
             Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
         }
-    }
-} 
+    } # messageLoop
+} # demoLoop 
 
 # put back old config
 Clear-SwappedConfigFiles
 
 # add temp prefixes to demo files
-$outputDemos = Get-ChildItem .\highlight\output | Where-Object -Property Extension -EQ '.dm_68'
+$outputDemos = Get-ChildItem .\highlight\output\clip | Where-Object -Property Extension -EQ '.dm_68'
 $index = 1
 foreach ($demo in $outputDemos) {
     # check file name
