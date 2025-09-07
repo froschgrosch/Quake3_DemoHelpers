@@ -20,10 +20,8 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |
 |   |---temp/
 |   |---input/
-|   |---output/
-|       |
-|       |---clip/
-|       |---demo/
+|   |---output_clip/
+|   |---output_demo/
 |
 |
 |---rename/
