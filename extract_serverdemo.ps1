@@ -7,6 +7,9 @@ function Invoke-Quake3e ($q3e_args) {
 $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 
+$starttime = Get-Date
+Write-Output 'Starting server-side demo conversion...'
+
 foreach ($f in $inputFiles){
   $name = $f.Name 
   $dirName = $f.Directory.Name
@@ -25,6 +28,7 @@ foreach ($f in $inputFiles){
     }
 
     # Scan server-side demo file
+    Write-Output ' ' "Converting $name..."
     Invoke-Quake3e @('+set logfile 2',"+record_scan $name")
  
     $text = Get-Content .\baseq3\qconsole.log
@@ -35,8 +39,6 @@ foreach ($f in $inputFiles){
             $client   = $line[0].Substring($line[0].IndexOf('(') + 1, $line[0].IndexOf(')') - $line[0].IndexOf('(') - 1)
             $instance = $line[1].Substring($line[1].IndexOf('(') + 1, $line[1].IndexOf(')') - $line[1].IndexOf('(') - 1)
 
-            Write-Output "Client $client Instance $instance"
-           
             Invoke-Quake3e @('+set logfile 0','+set sv_recordConvertSimulateFollow 0',"+record_convert $name $client $instance")
 
             if ($(Get-ItemProperty -Path .\baseq3\demos\output.dm_68 | Select-Object -ExpandProperty Length) -eq 0) { continue :lineloop }
@@ -58,13 +60,12 @@ foreach ($f in $inputFiles){
             $newname = $name.Substring(0,19)
             $newname = "$newname`_$map`_$player"
 
-            Write-Output "Player: $player" "Map: $map" $newname ' '
-            
+            Write-Output "(C$client I$instance) - $newname"
+
             # create new output folder if necessary
             if (-not $(Test-Path ".\serverdemo\output\$player\")){
-                New-Item -Path ".\serverdemo\output\" -Name $player -ItemType "directory"
+                $null = New-Item -Path ".\serverdemo\output\" -Name $player -ItemType "directory"
             }            
-
 
             if ($true) #$player -eq 'froschgrosch')
             {
@@ -76,6 +77,18 @@ foreach ($f in $inputFiles){
         }
     }
 }
-Get-ChildItem .\records\ | Where-Object -Property Extension -EQ '.rec' | Remove-Item
+
+$inputFiles = Get-ChildItem .\records\ | Where-Object -Property Extension -EQ '.rec' 
+$demonumber = $inputFiles.Count
+
+$inputFiles | Remove-Item
 Remove-Item .\baseq3\qconsole.log
+
+
+$endtime = Get-Date
+$duration_total = ($endtime - $starttime).TotalMinutes
+$duration_perDemo = ($endtime - $starttime).TotalSeconds / ($demonumber * 1.0)
+
+Write-Output ' ' 'Server-side demo conversion is completed.' ' '
+Write-Output "Number of demos: $demonumber" "Total time elapsed (min): $duration_total" "Average time per demo (sec): $duration_perDemo" ' '
 pause
