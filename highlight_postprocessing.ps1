@@ -1,10 +1,27 @@
-# This script won't handle mixed years in the input files - so be careful!
+function Test-DemoName ($year, $filename) {
+    if ($year -ne $settings.year) {
+        Write-Output "$filename is not from the correct year ($($settings.year))!" 'Please check your input folders!'
+        pause
+        exit 1
+    }
+}
 
 # read settings
 $settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
 
-# move finished demos
+# check if demos are from the correct year, otherwise exit
+$outputClips = Get-ChildItem .\highlight\output_clip | Where-Object -Property Extension -EQ '.dm_68'
 $outputDemos = Get-ChildItem .\highlight\output_demo\*.dm_68
+
+foreach ($f in $outputDemos){
+    Test-DemoName -year $f.Name.Substring(0,4) -filename $f.Name
+}
+foreach ($f in $outputClips){
+    Test-DemoName -year $f.Name.Substring(5,4) -filename $f.Name
+}
+
+# move finished demos
+Write-Output 'Moving demos...'
 $outputDemos.Name
 $outputDemos | Move-Item -Destination $settings.demoPath
 
@@ -13,7 +30,7 @@ $lastclip = Get-ChildItem "$($settings.clipPath)\*.dm_68" | Sort-Object -Propert
 $lastclip_number = [int]$lastclip.Name.Substring(0,4) + 1
 
 # rename and move clip files
-$outputClips = Get-ChildItem .\highlight\output_clip | Where-Object -Property Extension -EQ '.dm_68'
+Write-Output ' ' 'Moving clips...'
 foreach ($demo in $outputClips) {
     # check file name
     if ($demo.Name -match 'c\d{3}_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[\w-]+_\w+_\d+_\d+\w*\.dm_68'){
@@ -22,4 +39,5 @@ foreach ($demo in $outputClips) {
         $lastclip_number++
     }
 }
+Write-Output ' ' 'Post-processing is finished.'
 pause
