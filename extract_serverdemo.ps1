@@ -4,6 +4,7 @@ function Invoke-Quake3e ($q3e_args) {
     Start-Process -FilePath .\quake3e.ded.x64.exe -Wait -ArgumentList $q3e_args -WindowStyle Minimized
 }
 
+$players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 
 foreach ($f in $inputFiles){
@@ -29,7 +30,7 @@ foreach ($f in $inputFiles){
     $text = Get-Content .\baseq3\qconsole.log
     :lineloop foreach ($line in $text){
         if ($line -match 'client\(\d+\)\ instance\(\d+\)') { # line found
-            $line     = $line.Split(' ')
+            $line = $line.Split(' ')
             
             $client   = $line[0].Substring($line[0].IndexOf('(') + 1, $line[0].IndexOf(')') - $line[0].IndexOf('(') - 1)
             $instance = $line[1].Substring($line[1].IndexOf('(') + 1, $line[1].IndexOf(')') - $line[1].IndexOf('(') - 1)
@@ -41,10 +42,15 @@ foreach ($f in $inputFiles){
             if ($(Get-ItemProperty -Path .\baseq3\demos\output.dm_68 | Select-Object -ExpandProperty Length) -eq 0) { continue :lineloop }
 
             $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c ..\baseq3\demos\output.dm_68 | ConvertFrom-Json).gamestates[0]
-            #Wait-Process -Name "UDT_json"
-            #pause
 
-            $player = $udtoutput.demoTakerCleanName.Replace('LPG ','').Replace(' ','')
+            $player = $players | Where-Object -Property names -CContains $udtoutput.demoTakerCleanName
+            if ($null -eq $player) { # player not found, fall back to old behaviour
+                $player = $udtoutput.demoTakerCleanName.Replace('LPG ','').Replace(' ','')
+            } 
+            else {
+                $player = $player.names[0]
+            }
+
             $map = $udtoutput.configStringValues.mapname
 
             $date = Get-Date -Year $name.Substring(0,4) -Month $name.Substring(5,2) -Day $name.Substring(8,2) -Hour $name.Substring(11,2) -Minute $name.Substring(14,2) -Second $name.Substring(17,2)
@@ -54,6 +60,7 @@ foreach ($f in $inputFiles){
 
             Write-Output "Player: $player" "Map: $map" $newname ' '
             
+            # create new output folder if necessary
             if (-not $(Test-Path ".\serverdemo\output\$player\")){
                 New-Item -Path ".\serverdemo\output\" -Name $player -ItemType "directory"
             }            
@@ -66,8 +73,6 @@ foreach ($f in $inputFiles){
             } else {
                 Remove-Item .\baseq3\demos\output.dm_68
             }
-
-            #pause
         }
     }
 }
