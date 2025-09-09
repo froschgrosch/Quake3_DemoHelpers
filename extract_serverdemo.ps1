@@ -8,8 +8,17 @@ $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 
 $starttime = Get-Date
-Write-Output 'Starting server-side demo conversion...'
 
+if (-not $(Test-Path '.\records')){
+    $null = New-Item -Path '.\' -Name 'records' -ItemType "directory"
+} 
+else {
+    Write-Output 'The folder "records" exists! Please delete it before starting server-side demo conversion.'
+    pause
+    exit 1
+}
+
+Write-Output 'Starting server-side demo conversion...'
 foreach ($f in $inputFiles){
   $name = $f.Name 
   $dirName = $f.Directory.Name
@@ -81,7 +90,7 @@ foreach ($f in $inputFiles){
 $inputFiles = Get-ChildItem .\records\ | Where-Object -Property Extension -EQ '.rec' 
 $demonumber = $inputFiles.Count
 
-$inputFiles | Remove-Item
+Remove-Item -Recurse .\records\
 Remove-Item .\baseq3\qconsole.log
 
 

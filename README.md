@@ -40,7 +40,6 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |
 |   |---output/
 |
-|---records/
 |---zz_config/
 |   |
 |   |---highlights/
