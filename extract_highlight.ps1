@@ -32,7 +32,7 @@ function Get-UserInput{
     Param (
         [Parameter(Mandatory=$true)] [String]$prompt, # Prompt to be displayed
         [Parameter(Mandatory=$true)] [String]$rgx,    # Regex that needs to be matched
-        [Parameter(Mandatory=$false)] $allowEmpty = $false
+        [switch]$allowEmpty
     )
 
     do {
@@ -145,7 +145,7 @@ $swappedConfigFiles = @()
                         $newName = ".\highlight\output_clip\$($clipfile.Name.Replace('_CUT',''))"
 
                         # Validate suffix - only lowercase letters, digits and underscores are allowed
-                        $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty $true
+                        $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty
                         
                         if ($suffix.Length -gt 0){
                             $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
