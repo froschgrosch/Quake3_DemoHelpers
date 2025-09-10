@@ -1,8 +1,9 @@
 {
     "defaultOffset": { "start": 10, "end": 10 },
     "q3install" : {
-        "path": "C:\\Programme2\\Quake3_v7_4",
-        "executable" : "quake3e.x64.exe"
+        "path": "C:\\Programme2\\zz_Spiele\\Quake3_v7_4",
+        "executable" : "quake3e.x64.exe",
+        "allowedGames": ["arena","osp"]
     },
     "configSwapping": true
 }

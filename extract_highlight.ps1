@@ -54,6 +54,26 @@ $config = New-Object -TypeName PSObject
 Add-Member -InputObject $config -MemberType NoteProperty -Name 'players' -Value (Get-Content .\zz_config\players.json | ConvertFrom-Json)
 Add-Member -InputObject $config -MemberType NoteProperty -Name 'settings' -Value (Get-Content .\zz_config\highlights\settings.json | ConvertFrom-Json)
 
+# check if specified mods are actually installed properly
+if ($config.settings.q3install.allowedGames.Length -eq 0) {
+    Write-Output 'Error: No valid mods specified in the config file. Please specify at least one valid mod in the config file.'
+    pause
+    exit
+}
+
+foreach ($game in $config.settings.q3install.allowedGames) {
+    if (-Not (Test-Path -Path "$($config.settings.q3install.path)\$game\")) {
+        Write-Output "Error: Mod ""$game"" is specified in the config file. Please install the mod or remove it from the config file."
+        pause
+        exit
+    } 
+    else { # create "demos" folder in mod directory if it does not exist
+        if (-Not (Test-Path -Path "$($config.settings.q3install.path)\$game\demos")) {
+            $null = New-Item -Path "$($config.settings.q3install.path)\$game" -Name 'demos' -ItemType "directory"
+        }
+    }
+}
+
 # Get demos
 $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extension -EQ '.dm_68'
 
@@ -75,11 +95,17 @@ $swappedConfigFiles = @()
         }
     } 
     else { # file name format is not valid
-        Write-Output "Skipping $($file.Name.Replace('.dm_68',''))..."
+        Write-Output "Skipping $($file.Name.Replace('.dm_68','')) (file name format is not valid)..."
         continue demoloop
     }
 
     $gamename = $udtoutput.gameStates[0].configStringValues.gamename
+
+    # check if fs_game is valid
+    if (-not ($config.settings.q3install.allowedGames.Contains($gamename))){
+        Write-Output "Skipping $($file.Name.Replace('.dm_68','')) (mod ""$gamename"" is not installed)..."
+        continue demoloop
+    }
 
     # Swap config file in if necessary
     if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
