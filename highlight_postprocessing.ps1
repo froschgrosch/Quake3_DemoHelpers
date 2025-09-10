@@ -9,13 +9,13 @@ function Test-DemoName ($year, $filename) {
 # read settings
 $settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
 
-# check if demos are from the correct year, otherwise exit
-$outputClips = Get-ChildItem .\highlight\output_clip | Where-Object -Property Extension -EQ '.dm_68'
+# check if all demos and clips are from the correct year, exit otherwise
 $outputDemos = Get-ChildItem .\highlight\output_demo\*.dm_68
-
 foreach ($f in $outputDemos){
     Test-DemoName -year $f.Name.Substring(0,4) -filename $f.Name
 }
+
+$outputClips = Get-ChildItem .\highlight\output_clip\*.dm_68
 foreach ($f in $outputClips){
     Test-DemoName -year $f.Name.Substring(5,4) -filename $f.Name
 }
