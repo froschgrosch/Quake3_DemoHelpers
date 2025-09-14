@@ -69,6 +69,11 @@ foreach ($f in $inputFiles){
             $newname = $name.Substring(0,19)
             $newname = "$newname`_$map`_$player"
 
+            # add suffix to filename if instance is greater than 0 (to avoid overwriting other demos with the same)
+            if ($instance -gt 0) {
+                $newname = "$newname`_i$instance"
+            }
+
             Write-Output "(C$client I$instance) - $newname"
 
             # create new output folder if necessary
@@ -76,13 +81,8 @@ foreach ($f in $inputFiles){
                 $null = New-Item -Path ".\serverdemo\output\" -Name $player -ItemType "directory"
             }            
 
-            if ($true) #$player -eq 'froschgrosch')
-            {
-                $file = Move-Item -Force .\baseq3\demos\output.dm_68 ".\serverdemo\output\$player\$newname.dm_68" -PassThru         
-                $file.LastWriteTime = $date
-            } else {
-                Remove-Item .\baseq3\demos\output.dm_68
-            }
+            $file = Move-Item -Force .\baseq3\demos\output.dm_68 ".\serverdemo\output\$player\$newname.dm_68" -PassThru         
+            $file.LastWriteTime = $date
         }
     }
 }
