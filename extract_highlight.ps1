@@ -107,6 +107,29 @@ $swappedConfigFiles = @()
         continue demoloop
     }
 
+
+    # prepare message list
+    $intervals = @()
+
+    foreach ($message in $udtoutput.chat) {
+        # check if message is from correct player and has the correct content
+        if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
+            # displayed timestamps are not correct if player does not join at 0:00 matchtime
+
+            # Write-Output "Clip at Matchtime $(Format-ServerTime($message.serverTime - $udtoutput.gameStates[0].startTime))" 
+
+            # new variant
+            $intervals += [PSCustomObject]@{
+                start = [Math]::floor($message.serverTime / 1000 - $config.settings.defaultOffset.start)
+                end   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
+            }
+        }
+    } # messageLoop
+
+    if ($intervals.Count -eq 0) {
+        # demo is empty
+        continue :demoloop
+    }
     # Swap config file in if necessary
     if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
         if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
@@ -123,74 +146,65 @@ $swappedConfigFiles = @()
         '+demo highlight_preview'
     )
 
-    foreach ($message in $udtoutput.chat) {
-        # check if message is from correct player and has the correct content
-        if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
-            Write-Output "Clip at Matchtime $(Format-ServerTime($message.serverTime - $udtoutput.gameStates[0].startTime))" 
+    foreach ($interval in $intervals) {
+        $clipfile = Get-ClipFile $interval.start $interval.end $file $gamename
 
-            # server time needs to be in seconds
-            $starttime = [Math]::floor($message.serverTime / 1000 - $config.settings.defaultOffset.start)
-            $endtime   = [Math]::floor($message.serverTime / 1000 + $config.settings.defaultOffset.end)
+        # Select what to do
+        Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' '4 - Adjust start' '5 - Adjust end' 'c - Quit'
+        :decisionLoop do {
+            Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
+            
+            $selection = Get-UserInput 'Select action' '^[1-5|c]$'
+            switch($selection) {
+                '1' { # Keep - Add suffix and move file to output folder
+                    $newName = ".\highlight\output_clip\$($clipfile.Name.Replace('_CUT',''))"
 
-            $clipfile = Get-ClipFile $starttime $endtime $file $gamename
-
-            # Select what to do
-            Write-Output '1 - Keep' '2 - Delete' '3 - Watch again' '4 - Adjust start' '5 - Adjust end' 'c - Quit'
-            :decisionLoop do {
-                Start-Process -FilePath $($config.settings.q3install.path + '\' +  $config.settings.q3install.executable) -WorkingDirectory $config.settings.q3install.path -Wait -ArgumentList $q3e_args
-                
-                $selection = Get-UserInput 'Select action' '^[1-5|c]$'
-                switch($selection) {
-                    '1' { # Keep - Add suffix and move file to output folder
-                        $newName = ".\highlight\output_clip\$($clipfile.Name.Replace('_CUT',''))"
-
-                        # Validate suffix - only lowercase letters, digits and underscores are allowed
-                        $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty
-                        
-                        if ($suffix.Length -gt 0){
-                            $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
-                        }
-
-                        Move-Item -Force $clipfile.FullName -Destination $newName
-                        break decisionLoop
+                    # Validate suffix - only lowercase letters, digits and underscores are allowed
+                    $suffix = Get-UserInput 'Enter new suffix (optional)' '^[a-z0-9_]+$' -allowEmpty
+                    
+                    if ($suffix.Length -gt 0){
+                        $newName = $newName.Replace('.dm_68', "_$suffix.dm_68")
                     }
-                    '2' { # Delete -  Delete the clip file
-                        Remove-Item $clipfile.FullName
-                        break decisionLoop
-                    }
-                    '3' { # Watch again
-                        <# Do Nothing - decisionLoop will play the demo again #>
-                    }
-                    '4' { # Adjust start
-                        $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
-                        $starttime += $selection
 
-                        Remove-Item $clipfile.FullName
-                        $clipfile = Get-ClipFile $starttime $endtime $file $gamename
-                    }
-                    '5' { # Adjust end
-                        $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
-                        $endtime += $selection
-                        
-                        Remove-Item $clipfile.FullName
-                        $clipfile = Get-ClipFile $starttime $endtime $file $gamename
-                    }
-                    'c' { # Quit - clean up and exit
-
-                        # Delete clip in temp folder
-                        Remove-Item $clipfile.FullName 
-                        Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
-
-                        Clear-SwappedConfigFiles
-                        
-                        exit 
-                    }
+                    Move-Item -Force $clipfile.FullName -Destination $newName
+                    break decisionLoop
                 }
-            } while ($true) # :decisionLoop
-            Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
-        }
-    } # messageLoop
+                '2' { # Delete -  Delete the clip file
+                    Remove-Item $clipfile.FullName
+                    break decisionLoop
+                }
+                '3' { # Watch again
+                    <# Do Nothing - decisionLoop will play the demo again #>
+                }
+                '4' { # Adjust start
+                    $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
+                    $interval.start += $selection
 
+                    Remove-Item $clipfile.FullName
+                    $clipfile = Get-ClipFile $interval.start $interval.end $file $gamename
+                }
+                '5' { # Adjust end
+                    $selection = [int]$(Get-UserInput 'Enter Value (+ = later, - = earlier)' '^(-|\+)?\d+$') # allow +, - or no prefix
+                    $interval.end += $selection
+                    
+                    Remove-Item $clipfile.FullName
+                    $clipfile = Get-ClipFile $interval.start $interval.end $file $gamename
+                }
+                'c' { # Quit - clean up and exit
+
+                    # Delete clip in temp folder
+                    Remove-Item $clipfile.FullName 
+                    Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+
+                    Clear-SwappedConfigFiles
+                    
+                    exit 
+                }
+            }
+        } while ($true) # :decisionLoop
+        Remove-Item "$($config.settings.q3install.path)\$gamename\demos\highlight_preview.dm_68"
+    }
+    
     # move demo file when finished
     Move-Item $file.FullName -Destination ".\highlight\output_demo\$($file.Name)"
 } # demoLoop 
