@@ -1,12 +1,15 @@
 [
     { 
-        "names": ["froschgrosch", "LPG froschgrosch", "LPG froschgro"],
+        "names": [ "froschgrosch", "LPG froschgrosch", "LPG froschgro" ],
         "demoMarkers": [ "burt, please mArKdEmO", "y" ]
     }, {
-        "names": ["NamedPlayer", "LPG NamedPlayer", "LPG NamedPlay" ],
+        "names": [ "NamedPlayer", "LPG NamedPlayer", "LPG NamedPlay" ],
         "demoMarkers": [ "bekommenSieGicht" ]
     }, {
-        "names": ["Da_Schumi", "LPG Da_Schumi", "LPG Da_Schum" ],
+        "names": [ "Da_Schumi", "LPG Da_Schumi", "LPG Da_Schum" ],
         "demoMarkers": [ "l" ]
+    }, {
+        "names": [ "Qubus", "LPG Qubus" ],
+        "demoMarkers": [ "e" ]
     }
 ]
