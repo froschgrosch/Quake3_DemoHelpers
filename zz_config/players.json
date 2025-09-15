@@ -1,7 +1,7 @@
 [
     { 
         "names": ["froschgrosch", "LPG froschgrosch", "LPG froschgro"],
-        "demoMarkers": [ "y", "burt, please mArKdEmO"]
+        "demoMarkers": [ "burt, please mArKdEmO", "y" ]
     }, {
         "names": ["NamedPlayer", "LPG NamedPlayer", "LPG NamedPlay" ],
         "demoMarkers": [ "bekommenSieGicht" ]
