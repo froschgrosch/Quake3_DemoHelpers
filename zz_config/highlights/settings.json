@@ -5,5 +5,6 @@
         "executable" : "quake3e.x64.exe",
         "allowedGames": ["arena","osp"]
     },
-    "configSwapping": true
+    "configSwapping": true,
+    "considerOverlap": true
 }

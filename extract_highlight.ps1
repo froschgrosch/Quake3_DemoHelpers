@@ -130,6 +130,42 @@ $swappedConfigFiles = @()
         # demo is empty
         continue :demoloop
     }
+
+    
+    if ($config.considerOverlap) { # merge clip intervals
+
+        $mergedIntervals = New-Object System.Collections.ArrayList
+
+        # Add the first interval to the results list
+        $mergedIntervals.Add($intervals[0]) | Out-Null
+
+        # loop through the remaining intervals, starting from the second one (index 1)
+        for ($i = 1; $i -lt $intervals.Count; $i++) {
+            
+            $currentInterval = $intervals[$i]
+            # the last interval that we added to our results list
+            $lastMergedInterval = $mergedIntervals[$mergedIntervals.Count - 1]
+
+            # Case A: Overlap exists
+            # If the start of the current interval is less than or equal to the end of the last merged interval
+            if ($currentInterval.start -le $lastMergedInterval.end) {
+                
+                # Extend the last merged interval if the current interval reaches further
+                if ($currentInterval.end -gt $lastMergedInterval.end) {
+                    $lastMergedInterval.end = $currentInterval.end
+                }
+            }
+            # Case B: No overlap
+            else {
+                # Add the current interval as a new, separate item
+                $mergedIntervals.Add($currentInterval) | Out-Null
+            }
+        }
+
+        $intervals = $mergedIntervals
+    }
+
+
     # Swap config file in if necessary
     if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
         if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
