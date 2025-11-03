@@ -126,10 +126,11 @@ $swappedConfigFiles = @()
         }
     } # messageLoop
 
-    if ($intervals.Count -eq 0) {
-        # demo is empty
+    if ($intervals.Count -eq 0) {# demo is empty - move to output folder regardless
+        Move-Item $file.FullName -Destination ".\highlight\output_demo\$($file.Name)"
         continue :demoloop
     }
+
     # Swap config file in if necessary
     if ($config.settings.configSwapping -and (Test-Path -PathType Leaf -Path ".\zz_config\highlights\q3cfg\$gamename.cfg")){
         if (-Not (Test-Path -PathType Leaf -Path "$($config.settings.q3install.path)\$gamename\q3config.cfg.bak")){
