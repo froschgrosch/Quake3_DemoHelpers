@@ -1,3 +1,9 @@
+###########################################################################
+# Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
+# Licensed under GNU GPLv3. - File: extract_highlight.ps1                 #
+###########################################################################
+
+## FUNCTION DECLARATION ##
 function Format-ServerTime ($t) { 
     # This function takes the server time returned from UDT_json and formats it as min:sec
     $min = $t / 60000
@@ -41,6 +47,8 @@ function Get-UserInput{
     
     return $userinput
 }
+
+## PROGRAM START ##
 
 # check if output folder is empty - exit otherwise
 if (Test-Path -Path .\highlight\output_clip\*.dm_68){

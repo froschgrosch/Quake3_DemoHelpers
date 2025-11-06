@@ -1,3 +1,9 @@
+###########################################################################
+# Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
+# Licensed under GNU GPLv3. - File: rename.ps1                            #
+###########################################################################
+
+## PROGRAM START ##
 $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem  .\rename\input | Where-Object -Property Extension -EQ '.dm_68'
 

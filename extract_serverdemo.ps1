@@ -1,9 +1,16 @@
+###########################################################################
+# Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
+# Licensed under GNU GPLv3. - File: extract_serverdemo.ps1                #
+###########################################################################
+
+## FUNCTION DECLARATION ##
 function Invoke-Quake3e ($q3e_args) {
     $q3e_args += '+quit'
 
     Start-Process -FilePath .\quake3e.ded.x64.exe -Wait -ArgumentList $q3e_args -WindowStyle Minimized
 }
 
+## PROGRAM START ##
 $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $inputFiles = Get-ChildItem -Depth 2 .\serverdemo\input | Where-Object -Property Extension -EQ '.rec'
 

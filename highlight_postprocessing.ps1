@@ -1,3 +1,9 @@
+###########################################################################
+# Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
+# Licensed under GNU GPLv3. - File: highlight_postprocessing.ps1          #
+###########################################################################
+
+## FUNCTION DECLARATION ##
 function Test-DemoName ($year, $filename) {
     if ($year -ne $settings.year) {
         Write-Output "$filename is not from the correct year ($($settings.year))!" 'Please check your input folders!'
@@ -5,6 +11,8 @@ function Test-DemoName ($year, $filename) {
         exit 1
     }
 }
+
+## PROGRAM START ##
 
 # read settings
 $settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
