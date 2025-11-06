@@ -9,7 +9,6 @@ records/
 
 zz_tools/
 zz_config/highlights/q3cfg
-zz_config/autoprocessing/settings.json
 
 quake3e.ded.x64.exe
 pk3cache.dat
