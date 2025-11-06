@@ -65,6 +65,31 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |---quake3e.ded.x64.exe
 ```
 
+## Configuration
+
+### Global configuration
+
+#### `players.json`
+
+This file contains all players and their respective aliases and chat binds.
+
+The first player name is their "canonical" name. All occurences of the "alias" names (all other ones) will be replaced by this in the processing scripts.
+
+*Example player object:*
+
+```JSON
+{ 
+    "names": [ "froschgrosch", "LPG froschgrosch", "LPG froschgro" ],
+    "demoMarkers": [ "burt, please mArKdEmO", "y" ]
+}
+```
+
+### `autoprocessing\settings.json`
+
+In this file the final output folder paths for the demo and clip files are defined. It is implied that the demos and clips are stored per year (not per month, week etc.). 
+
+Please note that the program only runs if all input files are from the same year (this limitation might be removed in the future).
+
 ## Recommended binds for viewing demos
 
 ```text
