@@ -23,7 +23,6 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---output_clip/
 |   |---output_demo/
 |
-|
 |---rename/
 |   |
 |   |---input/
@@ -61,6 +60,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |---extract_highlight.ps1
 |---extract_serverdemo.ps1
 |---rename.ps1
+|---highlight_postprocessing.ps1
 |
 |---quake3e.ded.x64.exe
 ```
@@ -89,6 +89,22 @@ The first player name is their "canonical" name. All occurences of the "alias" n
 In this file the final output folder paths for the demo and clip files are defined. It is implied that the demos and clips are stored per year (not per month, week etc.). 
 
 Please note that the program only runs if all input files are from the same year (this limitation might be removed in the future).
+
+### Highlights
+
+#### `highlights\settings.json`
+
+| **Setting**      | **Explanation**                                                                                                                   |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `defaultOffset`  | This setting defines the default clip offset (the time from when the clip starts/ends until when the clip event actually happens) |
+| `q3install.*`    | In this setting the quake3 install path, binary name and allowed mods are defined.                                          |
+| `configSwapping` | This setting decides if config swapping is enabled or not.                                                                        |
+
+#### Config swapping
+
+An optional feature of `extract_highlight.ps1` is the config file swapping. This feature allows the user to have separate config files for viewing demo of multiple mods. Those config files will be swapped in dynamically while the script runs.
+
+For each mod there should be a q3config file named appropiately, for example `arena.cfg` or `osp.cfg` in the *q3cfg* folder. Only files for mods contained in `q3install.allowedGames` will be considered.
 
 ## Recommended binds for viewing demos
 

@@ -71,7 +71,7 @@ if ($config.settings.q3install.allowedGames.Length -eq 0) {
 
 foreach ($game in $config.settings.q3install.allowedGames) {
     if (-Not (Test-Path -Path "$($config.settings.q3install.path)\$game\")) {
-        Write-Output "Error: Mod ""$game"" is specified in the config file. Please install the mod or remove it from the config file."
+        Write-Output "Error: Mod ""$game"" is specified in the config file, but not present in the Quake 3 installation!" 'Please install the mod or remove it from the config file.'
         pause
         exit
     } 
