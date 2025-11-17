@@ -1,0 +1,41 @@
+###########################################################################
+# Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
+# Licensed under GNU GPLv3. - File: highlight_postprocessing.ps1          #
+###########################################################################
+
+## PROGRAM START ##
+$players = Get-Content .\zz_config\players.json | ConvertFrom-Json
+$settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
+
+$demos = Get-ChildItem ".\highlight\output_demo\*.dm_68"
+
+# move finished demos
+Write-Output 'Moving demos...'
+
+foreach ($demo in $demos) {
+    $name = $demo.Name
+    Write-Output $name
+
+    $year = $name.Substring(0,4)
+    $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c "..\highlight\output_demo\$name" | ConvertFrom-Json).gamestates[0]
+    
+    $player = $players | Where-Object -Property names -CContains $udtoutput.demoTakerCleanName
+    if ($null -eq $player) { # player not found, fall back to old behaviour
+        $player = $udtoutput.demoTakerCleanName.Replace('LPG ','').Replace(' ','')
+    } 
+    else {
+        $player = $player.names[0]
+    }
+    
+    $outputPath = $settings.outputPath.($udtoutput.configStringValues.fs_game).demo
+    $outputPath = $outputPath -f $player, $year
+    
+    # create output folder if it does not exist
+    if (!(Test-Path $outputPath)) {
+        $null = New-Item -Path $outputPath -ItemType Directory
+    }
+
+    $demo | Copy-Item -Force -Destination "$outputPath"
+}
+
+#$clips = Get-ChildItem ".\highlight\output_clip\*.dm_68"

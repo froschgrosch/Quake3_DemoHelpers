@@ -1,5 +1,12 @@
 {
-    "year": 2025,    
-    "demoPath": "C:\\path\\to\\demoFolder\\2025",
-    "clipPath": "C:\\path\\to\\clipFolder\\2025"
+    "outputPath": {
+        "arena": {
+            "demo": "C:\\temp\\highlight_test\\RA3\\{0}_RA3_{1}",
+            "clip": "C:\\temp\\highlight_test\\clips\\arena\\{0}\\{1}"
+        },
+        "osp": {
+            "demo": "C:\\temp\\highlight_test\\OSP\\{0}_OSP_{1}",
+            "clip": "C:\\temp\\highlight_test\\clips\\osp\\{0}\\{1}"
+        }   
+    }
 }
