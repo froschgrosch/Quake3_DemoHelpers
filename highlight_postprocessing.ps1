@@ -3,6 +3,10 @@
 # Licensed under GNU GPLv3. - File: highlight_postprocessing.ps1          #
 ###########################################################################
 
+## FUNCTION DECLARATION ##
+function Add-ToObject ($inputObject, $name, $value) {
+    Add-Member -Force -InputObject $inputObject -MemberType NoteProperty -Name $name -Value $value
+}
 
 function Get-DemoData ($file) {
     $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c $file | ConvertFrom-Json).gamestates[0]
@@ -51,4 +55,49 @@ foreach ($demo in $demos) {
     $demo | Copy-Item -Force -Destination $outputPath
 }
 
-#$clips = Get-ChildItem ".\highlight\output_clip\*.dm_68"
+
+# generate fresh clip indexes
+$clipIndex = New-Object -TypeName PSCustomObject
+foreach ($fs_game in $settings.outputPath.PSObject.Properties.Name){
+    Add-ToObject $clipIndex $fs_game (-1)
+}
+
+# move finished clips
+$clipFiles = Get-ChildItem '.\highlight\output_clip\*.dm_68'
+
+foreach ($clip in $clipFiles){
+    $clipData = Get-DemoData $clip
+
+    $outputPath = $settings.outputPath.($clipData.fs_game).clip
+    $outputPath = $outputPath -f $clipData.player, $clipData.year
+
+    $i = $clipIndex.($clipData.fs_game)
+    if ($i -eq -1) {
+        if (!(Test-Path $outputPath)) { # create output folder if it does not exist
+            $null = New-Item -Path $outputPath -ItemType Directory
+            $i = 0
+        } 
+        else { # output folder does exist, get next clip number
+            $lastclip = Get-ChildItem "$outputPath\*.dm_68" | Sort-Object -Property Name | Select-Object -Last 1
+            # todo: filter valid files
+            
+            if ($null -eq $lastclip) { # no files exist, start at 0
+                $i = 0
+            }
+            else { # assign current next number
+                $i = [int]$lastclip.Name.Substring(0,4) + 1
+            }   
+        }
+    } 
+
+    # add new prefix
+    $newName = '{0:d4}_{1}' -f $i, $clip.Name.Substring(5)
+    
+    # move to output folder with new name
+    $clip | Copy-Item -Force -Destination "$outputPath\$newName"
+
+    # todo: improve logging format, it does not look nice atm
+    Write-Output ('Moving {0}... (game: {2} | new index: {1:d4})' -f $clip.Name, $i, $clipData.fs_game)
+
+    $i++
+}
