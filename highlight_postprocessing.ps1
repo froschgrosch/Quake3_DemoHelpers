@@ -5,8 +5,6 @@
 
 
 function Get-DemoData ($file) {
-    $name = $file.Name
-    
     $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c $file | ConvertFrom-Json).gamestates[0]
     
     $player = $players | Where-Object -Property names -CContains $udtoutput.demoTakerCleanName
@@ -17,8 +15,13 @@ function Get-DemoData ($file) {
         $player = $player.names[0]
     }
 
+    $year = $file.NameSubstring(0,4)
+    if ($year -clike 'c*') { # demo is a clip demo
+        $year = $file.Name.Substring(5,4)
+    }
+
     return @{
-        year = $name.Substring(0,4)
+        year = $year
         fs_game = $udtoutput.configStringValues.fs_game
         player = $player
     }
