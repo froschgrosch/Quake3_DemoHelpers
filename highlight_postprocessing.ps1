@@ -15,7 +15,7 @@ function Get-DemoData ($file) {
         $player = $player.names[0]
     }
 
-    $year = $file.NameSubstring(0,4)
+    $year = $file.Name.Substring(0,4)
     if ($year -clike 'c*') { # demo is a clip demo
         $year = $file.Name.Substring(5,4)
     }
