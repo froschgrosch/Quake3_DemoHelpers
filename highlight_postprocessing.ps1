@@ -42,7 +42,7 @@ Write-Output 'Moving demos...'
 
 foreach ($demo in $demos) {
     $demoData = Get-DemoData $demo
-    Write-Output $demo.name $demoData ''
+    Write-Output $demo.name
     
     $outputPath = $settings.outputPath.($demoData.fs_game).demo
     $outputPath = $outputPath -f $demoData.player, $demoData.year
@@ -52,7 +52,7 @@ foreach ($demo in $demos) {
         $null = New-Item -Path $outputPath -ItemType Directory
     }
 
-    $demo | Copy-Item -Force -Destination $outputPath
+    $demo | Move-Item -Destination $outputPath
 }
 
 
@@ -62,8 +62,10 @@ foreach ($fs_game in $settings.outputPath.PSObject.Properties.Name){
     Add-ToObject $clipIndex $fs_game (-1)
 }
 
-# move finished clips
 $clipFiles = Get-ChildItem '.\highlight\output_clip\*.dm_68'
+
+# move finished clips
+Write-Output ' ' 'Moving clips...'
 
 foreach ($clip in $clipFiles){
     $clipData = Get-DemoData $clip
@@ -94,10 +96,12 @@ foreach ($clip in $clipFiles){
     $newName = '{0:d4}_{1}' -f $i, $clip.Name.Substring(5)
     
     # move to output folder with new name
-    $clip | Copy-Item -Force -Destination "$outputPath\$newName"
+    $clip | Move-Item -Destination "$outputPath\$newName"
 
     # todo: improve logging format, it does not look nice atm
     Write-Output ('Moving {0}... (game: {2} | new index: {1:d4})' -f $clip.Name, $i, $clipData.fs_game)
 
     $i++
 }
+Write-Output ' ' 'Post-processing is finished.'
+pause
