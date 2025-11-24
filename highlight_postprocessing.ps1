@@ -73,35 +73,34 @@ foreach ($clip in $clipFiles){
     $outputPath = $settings.outputPath.($clipData.fs_game).clip
     $outputPath = $outputPath -f $clipData.player, $clipData.year
 
-    $i = $clipIndex.($clipData.fs_game)
-    if ($i -eq -1) {
+    if ($clipIndex.($clipData.fs_game) -eq -1) {
         if (!(Test-Path $outputPath)) { # create output folder if it does not exist
             $null = New-Item -Path $outputPath -ItemType Directory
-            $i = 0
+            $clipIndex.($clipData.fs_game) = 0
         } 
         else { # output folder does exist, get next clip number
             $lastclip = Get-ChildItem "$outputPath\*.dm_68" | Sort-Object -Property Name | Select-Object -Last 1
             # todo: filter valid files
             
             if ($null -eq $lastclip) { # no files exist, start at 0
-                $i = 0
+                $clipIndex.($clipData.fs_game) = 0
             }
             else { # assign current next number
-                $i = [int]$lastclip.Name.Substring(0,4) + 1
+                $clipIndex.($clipData.fs_game) = [int]$lastclip.Name.Substring(0,4) + 1
             }   
         }
     } 
 
     # add new prefix
-    $newName = '{0:d4}_{1}' -f $i, $clip.Name.Substring(5)
+    $newName = '{0:d4}_{1}' -f  $clipIndex.($clipData.fs_game), $clip.Name.Substring(5)
     
     # move to output folder with new name
-    $clip | Move-Item -Destination "$outputPath\$newName"
+    #$clip | Move-Item -Destination "$outputPath\$newName"
 
     # todo: improve logging format, it does not look nice atm
-    Write-Output ('Moving {0}... (game: {2} | new index: {1:d4})' -f $clip.Name, $i, $clipData.fs_game)
+    Write-Output ('Moving {0}... (game: {2} | new index: {1:d4})' -f $clip.Name, $clipIndex.($clipData.fs_game), $clipData.fs_game)
 
-    $i++
+    $clipIndex.($clipData.fs_game)++
 }
 Write-Output ' ' 'Post-processing is finished.'
 pause
