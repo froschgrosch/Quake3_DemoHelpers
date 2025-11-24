@@ -57,9 +57,11 @@ foreach ($demo in $demos) {
 
 
 # generate fresh clip indexes
+$maxfsGameLength = 0
 $clipIndex = New-Object -TypeName PSCustomObject
 foreach ($fs_game in $settings.outputPath.PSObject.Properties.Name){
     Add-ToObject $clipIndex $fs_game (-1)
+    $maxfsGameLength = ($maxfsGameLength, $fs_game.Length | Measure-Object -Maximum).Maximum
 }
 
 $clipFiles = Get-ChildItem '.\highlight\output_clip\*.dm_68'
@@ -98,7 +100,7 @@ foreach ($clip in $clipFiles){
     #$clip | Move-Item -Destination "$outputPath\$newName"
 
     # todo: improve logging format, it does not look nice atm
-    Write-Output ('Moving {0}... (game: {2} | new index: {1:d4})' -f $clip.Name, $clipIndex.($clipData.fs_game), $clipData.fs_game)
+    Write-Output ("(game: {2,-$maxfsGameLength}  new index: {1:d4}) - Moving {0}..." -f $clip.Name, $clipIndex.($clipData.fs_game), $clipData.fs_game)
 
     $clipIndex.($clipData.fs_game)++
 }
