@@ -35,15 +35,24 @@ function Get-DemoData ($file) {
 $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
 $settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
 
+$games = $settings.outputPath.PSObject.Properties.Name
+
 $demos = Get-ChildItem '.\highlight\output_demo\*.dm_68'
 
 # move finished demos
 Write-Output 'Moving demos...'
 
-foreach ($demo in $demos) {
+:demoLoop foreach ($demo in $demos) {
     $demoData = Get-DemoData $demo
     Write-Output $demo.name
     
+    # check if fs_game is valid
+    if ($games -NotContains $demoData.fs_game){
+        Write-Output ('Warning: "{0}" is not a valid game! Moving to .\postprocessing\demo_invalid...' -f $demoData.fs_game)
+        $demo | Move-Item -Destination .\postprocessing\demo_invalid
+        continue :demoLoop
+    }
+
     $outputPath = $settings.outputPath.($demoData.fs_game).demo
     $outputPath = $outputPath -f $demoData.player, $demoData.year
     
@@ -59,7 +68,7 @@ foreach ($demo in $demos) {
 # generate fresh clip indexes
 $maxfsGameLength = 0
 $clipIndex = New-Object -TypeName PSCustomObject
-foreach ($fs_game in $settings.outputPath.PSObject.Properties.Name){
+foreach ($fs_game in $games){
     Add-ToObject $clipIndex $fs_game (-1)
     $maxfsGameLength = ($maxfsGameLength, $fs_game.Length | Measure-Object -Maximum).Maximum
 }
@@ -69,8 +78,15 @@ $clipFiles = Get-ChildItem '.\highlight\output_clip\*.dm_68'
 # move finished clips
 Write-Output ' ' 'Moving clips...'
 
-foreach ($clip in $clipFiles){
+:clipLoop foreach ($clip in $clipFiles){
     $clipData = Get-DemoData $clip
+
+    # check if fs_game is valid
+    if ($games -NotContains $clipData.fs_game){
+        Write-Output ('Warning: "{0}" is not a valid game! Moving to .\postprocessing\clip_invalid...' -f $clipData.fs_game)
+        $clip | Move-Item -Destination .\postprocessing\clip_invalid
+        continue :clipLoop
+    }
 
     $outputPath = $settings.outputPath.($clipData.fs_game).clip
     $outputPath = $outputPath -f $clipData.player, $clipData.year
@@ -97,10 +113,9 @@ foreach ($clip in $clipFiles){
     $newName = '{0:d4}_{1}' -f  $clipIndex.($clipData.fs_game), $clip.Name.Substring(5)
     
     # move to output folder with new name
-    #$clip | Move-Item -Destination "$outputPath\$newName"
+    $clip | Move-Item -Destination "$outputPath\$newName"
 
-    # todo: improve logging format, it does not look nice atm
-    Write-Output ("(game: {2,-$maxfsGameLength}  new index: {1:d4}) - Moving {0}..." -f $clip.Name, $clipIndex.($clipData.fs_game), $clipData.fs_game)
+    Write-Output ("(game: {2,$maxfsGameLength} - new index: {1:d4}) - Moving {0}..." -f $clip.Name, $clipIndex.($clipData.fs_game), $clipData.fs_game)
 
     $clipIndex.($clipData.fs_game)++
 }
