@@ -82,6 +82,13 @@ foreach ($game in $config.settings.q3install.allowedGames) {
     }
 }
 
+# Pause before starting execution (if desired)
+if ($config.settings.pauseAtStart) {
+    Write-Output 'Press enter to start.'
+    pause
+    Clear-Host
+}
+
 # Get demos
 $inputFiles = Get-ChildItem  .\highlight\input | Where-Object -Property Extension -EQ '.dm_68'
 

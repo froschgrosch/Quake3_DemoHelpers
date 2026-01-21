@@ -94,11 +94,12 @@ Please note that the program only runs if all input files are from the same year
 
 #### `highlights\settings.json`
 
-| **Setting**      | **Explanation**                                                                                                                   |
-|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `defaultOffset`  | This setting defines the default clip offset (the time from when the clip starts/ends until when the clip event actually happens) |
-| `q3install.*`    | In this setting the quake3 install path, binary name and allowed mods are defined.                                          |
-| `configSwapping` | This setting decides if config swapping is enabled or not.                                                                        |
+| **Setting**      | **Explanation**                                                                                                                                      |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `defaultOffset`  | This setting defines the default clip offset (the time from when the clip starts/ends until when the clip event actually happens)                  |
+| `q3install.*`    | In this setting the quake3 install path, binary name and allowed mods are defined.                                                                 |
+| `configSwapping` | This setting decides if config swapping is enabled or not.                                                                                         |
+| `pauseAtStart`   | This setting makes the program pause before starting execution. Useful for moving the window to a different screen before starting the extraction. | 
 
 #### Config swapping
 
