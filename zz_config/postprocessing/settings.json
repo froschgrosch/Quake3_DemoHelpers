@@ -1,0 +1,12 @@
+{
+    "outputPath": {
+        "arena": {
+            "demo": "C:\\path\\to\\RA3_demoFolder\\{0}\\{1}",
+            "clip": "C:\\path\\to\\RA3_clipFolder\\{0}\\{1}"
+        },
+        "osp": {
+            "demo": "C:\\path\\to\\OSP_demoFolder\\{0}\\{1}",
+            "clip": "C:\\path\\to\\OSP_clipFolder\\{0}\\{1}"
+        }   
+    }
+}

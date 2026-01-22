@@ -23,6 +23,11 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---output_clip/
 |   |---output_demo/
 |
+|---postprocessing (will be auto-generated)
+|   |
+|   |---clip_invalid/
+|   |---demo_invalid/
+|
 |---rename/
 |   |
 |   |---input/
@@ -84,11 +89,25 @@ The first player name is their "canonical" name. All occurences of the "alias" n
 }
 ```
 
-### `autoprocessing\settings.json`
+### Post-Processing
 
-In this file the final output folder paths for the demo and clip files are defined. It is implied that the demos and clips are stored per year (not per month, week etc.). 
+The postprocessing script moves all demo and clip files to their defined output folders automatically. Clip numbers are handled based on what is already present in the target folder.
+New folders are created automatically for each new year. 
 
-Please note that the program only runs if all input files are from the same year (this limitation might be removed in the future).
+If there is no output folder defined for the fs_game of a particular demo, it is moved to the respective "invalid" folder where it can be retrieved afterwards.
+
+#### `postprocessing\settings.json`
+
+Here the different output folders are defined. `{0}` will be substituted with the player name, `{1}` will be the year.
+
+*Example fs_game object:*
+
+```JSON
+"arena": {
+    "demo": "C:\\path\\to\\RA3_demoFolder\\{0}\\{1}",
+    "clip": "C:\\path\\to\\RA3_clipFolder\\{0}\\{1}"
+}
+```
 
 ### Highlights
 
