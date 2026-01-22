@@ -33,7 +33,7 @@ function Get-DemoData ($file) {
 
 ## PROGRAM START ##
 $players = Get-Content .\zz_config\players.json | ConvertFrom-Json
-$settings = Get-Content .\zz_config\autoprocessing\settings.json | ConvertFrom-Json
+$settings = Get-Content .\zz_config\postprocessing\settings.json | ConvertFrom-Json
 
 $games = $settings.outputPath.PSObject.Properties.Name
 

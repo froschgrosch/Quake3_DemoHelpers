@@ -1,9 +1,9 @@
 baseq3/demos/
 baseq3/qconsole.log
 
-rename/
-highlight/
-postprocessing/
+./rename/
+./highlight/
+./postprocessing/
 
 serverdemo/
 records/
