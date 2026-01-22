@@ -23,7 +23,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---output_clip/
 |   |---output_demo/
 |
-|---postprocessing
+|---postprocessing (will be auto-generated)
 |   |
 |   |---clip_invalid/
 |   |---demo_invalid/

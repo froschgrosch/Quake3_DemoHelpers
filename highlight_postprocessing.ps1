@@ -49,6 +49,12 @@ Write-Output 'Moving demos...'
     # check if fs_game is valid
     if ($games -NotContains $demoData.fs_game){
         Write-Output ('Warning: "{0}" is not a valid game! Moving to .\postprocessing\demo_invalid...' -f $demoData.fs_game)
+        
+        # create invalid folder if it does not exist
+        if (!(Test-Path .\postprocessing\demo_invalid)) {
+            $null = New-Item -Path .\postprocessing\demo_invalid -ItemType Directory
+        }
+
         $demo | Move-Item -Destination .\postprocessing\demo_invalid
         continue :demoLoop
     }
@@ -84,6 +90,12 @@ Write-Output ' ' 'Moving clips...'
     # check if fs_game is valid
     if ($games -NotContains $clipData.fs_game){
         Write-Output ('Warning: "{0}" is not a valid game! Moving to .\postprocessing\clip_invalid...' -f $clipData.fs_game)
+        
+        # create invalid folder if it does not exist
+        if (!(Test-Path .\postprocessing\clip_invalid)) {
+            $null = New-Item -Path .\postprocessing\clip_invalid -ItemType Directory
+        }
+        
         $clip | Move-Item -Destination .\postprocessing\clip_invalid
         continue :clipLoop
     }
