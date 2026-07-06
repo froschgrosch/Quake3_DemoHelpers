@@ -4,9 +4,6 @@
 # Licensed under GNU GPLv3. - File: rename.sh                             #
 ###########################################################################
 
-
-#files=$(basename -a ./rename/input/*.dm_68)
-
 for file in ./rename/input/*.dm_68; do
     file=$(basename -a $file)
     echo Old: ${file/.dm_68/}
@@ -17,7 +14,7 @@ for file in ./rename/input/*.dm_68; do
     player=$(echo "$udtoutput" | jq -r .gameStates[0].demoTakerCleanName)
 
     # select canonical name
-    player=$(cat zz_config/players.json | jq -r --arg name "$player" '( .[] | select(.names | index($name) != null) | .names[0] ) // ($name | sub("^LPG "; ""))')
+    player=$(jq -r --arg name "$player" '( .[] | select(.names | index($name) != null) | .names[0] ) // ($name | sub("^LPG "; ""))' ./zz_config/players.json)
 
     map=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.mapname)
 
