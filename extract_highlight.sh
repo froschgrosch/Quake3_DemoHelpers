@@ -46,7 +46,6 @@ for file in ./highlight/input/*.dm_68; do
             #echo "ST: $starttime - ET: $endtime"
 
             zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
-
             clipfile=$(basename -a ./highlight/temp/*.dm_68)
 
             #echo ./highlight/temp/$clipfile "$demopath"
@@ -60,7 +59,7 @@ for file in ./highlight/input/*.dm_68; do
                 # select action
                 echo 'c) Quit'
 
-                select action in 'Keep' 'Delete' 'Watch again'; do
+                select action in 'Keep' 'Delete' 'Watch again' 'Adjust start' 'Adjust end'; do
                     #echo "$REPLY $action"
 
                     case $REPLY in
@@ -88,7 +87,7 @@ for file in ./highlight/input/*.dm_68; do
                             break 2 # decision loop
                         ;;
 
-                        # Keep - move file to output folder
+                        # Delete - remove file from temp folder and move on
                         2)
                             rm ./highlight/temp/$clipfile
 
@@ -101,15 +100,52 @@ for file in ./highlight/input/*.dm_68; do
                             break 1 # select statement
                         ;;
 
+                        # Adjust start time
+                        4)
+                            number='a' # make it invalid so the loop runs at least once
+                            until [[ $number == ?(-|+)+([0-9]) ]]; do
+                                read -p 'Enter Value (+ = later, - = earlier) ? ' 'number'
+                            done
+
+                            starttime=$(($starttime + $number))
+
+                            rm $demopath ./highlight/temp/$clipfile
+
+                            zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
+                            clipfile=$(basename -a ./highlight/temp/*.dm_68)
+                            cp ./highlight/temp/$clipfile "$demopath"
+
+                            # the decision loop will play the new demo
+                            break 1 # select statement
+                        ;;
+
+                        5)
+                            number='a' # make it invalid so the loop runs at least once
+                            until [[ $number == ?(-|+)+([0-9]) ]]; do
+                                read -p 'Enter Value (+ = later, - = earlier) ? ' 'number'
+                            done
+
+                            endtime=$(($endtime + $number))
+
+                            rm $demopath ./highlight/temp/$clipfile
+
+                            zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
+                            clipfile=$(basename -a ./highlight/temp/*.dm_68)
+                            cp ./highlight/temp/$clipfile "$demopath"
+
+                            # the decision loop will play the new demo
+                            break 1 # select statement
+                        ;;
+
                         *)
                         ;;
                     esac
                 done # select loop
             done # decision loop
-        fi # endif the message is matching criteria
 
-        # clean up remaining preview file
-        rm $demopath
+            # clean up remaining preview file
+            rm $demopath
+        fi # endif the message is matching criteria
     done # message loop
 
     # move demo to output folder
