@@ -72,8 +72,18 @@ for file in ./highlight/input/*.dm_68; do
 
                         # Keep - move file to output folder
                         1)
-                            # todo: add suffix to filename
-                            mv ./highlight/temp/$clipfile ./highlight/output_clip/${clipfile/_CUT/}
+                            newname=${clipfile/_CUT/}
+
+                            suffix='!' # make it invalid so the loop runs at least once
+                            until [[ $suffix == *([a-z0-9_]) ]]; do
+                                read -p 'Enter new suffix (optional) ? ' 'suffix'
+                            done
+
+                            newname=${newname/.dm_68/}
+                            newname="$newname${suffix:+_$suffix}.dm_68"
+
+                            #echo $newname
+                            mv ./highlight/temp/$clipfile ./highlight/output_clip/$newname
 
                             break 2 # decision loop
                         ;;
@@ -87,6 +97,7 @@ for file in ./highlight/input/*.dm_68; do
 
                         # Watch again
                         3)
+                            # Do nothing - the decision loop will play the demo again
                             break 1 # select statement
                         ;;
 
