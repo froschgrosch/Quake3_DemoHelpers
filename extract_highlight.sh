@@ -4,6 +4,16 @@
 # Licensed under GNU GPLv3. - File: extract_highlight.sh                  #
 ###########################################################################
 
+shopt -s extglob
+
+# check if input folder is empty
+if [ ! -f ./highlight/input/*.dm_68 ]
+then
+    echo 'No files in input folder! Exiting.'
+    exit
+fi
+
+# program start
 for file in ./highlight/input/*.dm_68; do
     file=$(basename -a $file)
 
@@ -26,12 +36,21 @@ for file in ./highlight/input/*.dm_68; do
 
     echo "Selecting $file..."
 
+    # skip the demo if there are no chat messages present
+    if [[ $(echo "$udtoutput" | jq -c '.chat | length') -eq '0' ]]
+    then
+        #echo 'Demo contains no chat messages!'; echo
+
+        mv ./highlight/input/$file ./highlight/output_demo/
+        continue
+    fi
+
+    readarray -t messages < <(echo "$udtoutput" | jq -c '.chat.[]')
+
     # preprocess values
     gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
     demopath="$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)/$gamename/demos/highlight_preview.dm_68"
     execpath=$(jq -r '.q3install.path + "/" + .q3install.executable' ./zz_config/highlights/settings.json)
-
-    readarray -t messages < <(echo "$udtoutput" | jq -c '.chat.[]')
 
     # iterate through chat messages
     for message in "${messages[@]}"; do
