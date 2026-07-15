@@ -127,7 +127,7 @@ $swappedConfigFiles = @()
 
     foreach ($message in $udtoutput.chat) {
         # check if message is from correct player and has the correct content
-        if ($player.names -contains $message.cleanPlayerName -and $player.demoMarkers -contains $message.cleanMessage) {
+        if ($player.names -CContains $message.cleanPlayerName -and $player.demoMarkers -CContains $message.cleanMessage) {
             # displayed timestamps are not correct if player does not join at 0:00 matchtime
 
             # Write-Output "Clip at Matchtime $(Format-ServerTime($message.serverTime - $udtoutput.gameStates[0].startTime))" 
