@@ -4,6 +4,36 @@
 # Licensed under GNU GPLv3. - File: extract_highlight.sh                  #
 ###########################################################################
 
+## function declaration ##
+
+function clear_config_files() {
+    if [[ $(jq '.configSwapping' ./zz_config/highlights/settings.json) != true ]] then
+        return
+    fi
+
+    readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
+
+    for game in "${allowedGames[@]}"; do
+        # check if swap marker is present
+        if [ -f "./zz_config/highlights/q3cfg/$game.swapped" ]
+        then
+
+            # check if the .bak file actually exists
+            if [ -f "$q3path/$game/q3config.cfg.bak" ]
+            then
+                rm "$q3path/$game/q3config.cfg"
+                mv "$q3path/$game/q3config.cfg.bak" "$q3path/$game/q3config.cfg" # is there a better way for renaming a file in place?!
+            fi
+
+            # remove swap marker
+            rm "./zz_config/highlights/q3cfg/$game.swapped"
+        fi
+    done
+
+    # would probably be good to handle the case when there is no swap marker present, but the config file has been swapped nonetheless
+    return
+}
+
 ## initialization ##
 
 # enable globbing (needed later)
@@ -60,6 +90,20 @@ for file in ./highlight/input/*.dm_68; do
     gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
     demopath="$q3path/$gamename/demos/highlight_preview.dm_68"
 
+    # swap config file if needed
+    if [[ $(jq '.configSwapping' ./zz_config/highlights/settings.json) == true ]]
+    then
+        if [ ! -f "./zz_config/highlights/q3cfg/$gamename.swapped" ]
+        then
+            if [ ! -f "$q3path/$gamename/q3config.cfg.bak" ]
+            then
+                mv "$q3path/$gamename/q3config.cfg" "$q3path/$gamename/q3config.cfg.bak"
+                cp "./zz_config/highlights/q3cfg/$gamename.cfg" "$q3path/$gamename/q3config.cfg"
+            fi
+            touch "./zz_config/highlights/q3cfg/$gamename.swapped"
+        fi
+    fi
+
     # iterate through chat messages
     for message in "${messages[@]}"; do
         # check if the message is matching criteria
@@ -92,7 +136,8 @@ for file in ./highlight/input/*.dm_68; do
                     case $REPLY in
                         # Quit - clean up and exit
                         [Cc]*)
-                            rm $demopath
+                            rm $clipfile $demopath
+                            clear_config_files
                             exit 0
                         ;;
 
@@ -178,4 +223,6 @@ for file in ./highlight/input/*.dm_68; do
     # move demo to output folder
     mv ./highlight/input/$file ./highlight/output_demo/
 done # file loop
+
+clear_config_files
 echo 'Demo processing is finished.'
