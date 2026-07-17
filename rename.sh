@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ###########################################################################
 # Quake3_DemoHelpers - https://github.com/froschgrosch/Quake3_DemoHelpers #
 # Licensed under GNU GPLv3. - File: rename.sh                             #
