@@ -4,7 +4,16 @@
 # Licensed under GNU GPLv3. - File: extract_highlight.sh                  #
 ###########################################################################
 
+## initialization ##
+
+# enable globbing (needed later)
 shopt -s extglob
+
+# read install path and executable name
+q3exec=$(jq -r '.q3install.executable' ./zz_config/highlights/settings.json)
+q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
+
+##  program start ##
 
 # check if input folder is empty
 if [ ! -f ./highlight/input/*.dm_68 ]
@@ -13,7 +22,7 @@ then
     exit
 fi
 
-# program start
+# main demo loop
 for file in ./highlight/input/*.dm_68; do
     file=$(basename -a $file)
 
@@ -49,8 +58,7 @@ for file in ./highlight/input/*.dm_68; do
 
     # preprocess values
     gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
-    demopath="$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)/$gamename/demos/highlight_preview.dm_68"
-    execpath=$(jq -r '.q3install.path + "/" + .q3install.executable' ./zz_config/highlights/settings.json)
+    demopath="$q3path/$gamename/demos/highlight_preview.dm_68"
 
     # iterate through chat messages
     for message in "${messages[@]}"; do
@@ -73,7 +81,7 @@ for file in ./highlight/input/*.dm_68; do
             # decision loop
             while true; do
                 # play demo
-                $execpath +set fs_game "$gamename" +set fs_homepath "$(dirname "$execpath")" +set nextdemo 'quit' +demo 'highlight_preview.dm_68' &> /dev/null
+                "$q3path/$q3exec" +set fs_game "$gamename" +set fs_homepath "$q3path" +set nextdemo 'quit' +demo 'highlight_preview.dm_68' &> /dev/null
 
                 # select action
                 echo 'c) Quit'
