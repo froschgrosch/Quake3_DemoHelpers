@@ -34,6 +34,18 @@ function clear_config_files() {
     return
 }
 
+function get_clip_file () {
+    zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
+    clipfile=$(basename -a ./highlight/temp/*.dm_68)
+
+    if [ -f "$demopath" ]
+    then
+        rm "$demopath"
+    fi
+
+    cp ./highlight/temp/$clipfile "$demopath"
+}
+
 ## initialization ##
 
 # enable globbing (needed later)
@@ -115,12 +127,7 @@ for file in ./highlight/input/*.dm_68; do
             endtime=$(jq --argjson msg "$message" '($msg.serverTime / 1000 + .defaultOffset.end)|floor' ./zz_config/highlights/settings.json)
 
             #echo "ST: $starttime - ET: $endtime"
-
-            zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
-            clipfile=$(basename -a ./highlight/temp/*.dm_68)
-
-            #echo ./highlight/temp/$clipfile "$demopath"
-            cp ./highlight/temp/$clipfile "$demopath"
+            get_clip_file
 
             # decision loop
             while true; do
@@ -136,7 +143,7 @@ for file in ./highlight/input/*.dm_68; do
                     case $REPLY in
                         # Quit - clean up and exit
                         [Cc]*)
-                            rm $clipfile $demopath
+                            rm ./highlight/temp/$clipfile $demopath
                             clear_config_files
                             exit 0
                         ;;
@@ -182,10 +189,7 @@ for file in ./highlight/input/*.dm_68; do
                             starttime=$(($starttime + $number))
 
                             rm $demopath ./highlight/temp/$clipfile
-
-                            zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
-                            clipfile=$(basename -a ./highlight/temp/*.dm_68)
-                            cp ./highlight/temp/$clipfile "$demopath"
+                            get_clip_file
 
                             # the decision loop will play the new demo
                             break 1 # select statement
@@ -200,10 +204,7 @@ for file in ./highlight/input/*.dm_68; do
                             endtime=$(($endtime + $number))
 
                             rm $demopath ./highlight/temp/$clipfile
-
-                            zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
-                            clipfile=$(basename -a ./highlight/temp/*.dm_68)
-                            cp ./highlight/temp/$clipfile "$demopath"
+                            get_clip_file
 
                             # the decision loop will play the new demo
                             break 1 # select statement
