@@ -58,10 +58,11 @@ q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
 ##  program start ##
 
 # check if input folder is empty
-if [ ! -f ./highlight/input/*.dm_68 ]
+ls ./highlight/input/*.dm_68 1> /dev/null 2>&1
+if [ $? -eq 2 ]
 then
     echo 'No files in input folder! Exiting.'
-    exit
+    exit 1
 fi
 
 # main demo loop
@@ -123,8 +124,8 @@ for file in ./highlight/input/*.dm_68; do
         then
             #echo $message | jq
 
-            starttime=$(jq --argjson msg "$message" '($msg.serverTime / 1000 - .defaultOffset.start)|floor' ./zz_config/highlights/settings.json)
-            endtime=$(jq --argjson msg "$message" '($msg.serverTime / 1000 + .defaultOffset.end)|floor' ./zz_config/highlights/settings.json)
+            starttime=$(jq --argjson msg "$message" '($msg.serverTime / 1000 - .defaultOffset.start) | floor' ./zz_config/highlights/settings.json)
+            endtime=$(jq --argjson msg "$message" '($msg.serverTime / 1000 + .defaultOffset.end) | floor' ./zz_config/highlights/settings.json)
 
             #echo "ST: $starttime - ET: $endtime"
             get_clip_file
@@ -157,8 +158,7 @@ for file in ./highlight/input/*.dm_68; do
                                 read -p 'Enter new suffix (optional) ? ' 'suffix'
                             done
 
-                            newname=${newname/.dm_68/}
-                            newname="$newname${suffix:+_$suffix}.dm_68"
+                            newname="${newname/.dm_68/}${suffix:+_$suffix}.dm_68"
 
                             #echo $newname
                             mv ./highlight/temp/$clipfile ./highlight/output_clip/$newname
@@ -208,9 +208,6 @@ for file in ./highlight/input/*.dm_68; do
 
                             # the decision loop will play the new demo
                             break 1 # select statement
-                        ;;
-
-                        *)
                         ;;
                     esac
                 done # select loop
