@@ -6,6 +6,8 @@ The `extract_serverdemo.ps1` script uses a very slightly modified version of Cho
 
 It IS however required to install UDT_cutter and UDT_json to ensure functionality of all scripts. The aforementioned tools can be obtained at [myT's page](https://myt.playmorepromode.com/udt/redirections/), check *windows_console_x64*,  *windows_console_x86*, *linux_console_x64* or *linux_console_x86*.
 
+The scripts for extracting demos from server-side demos and for automatic post processing are currently only available in powershell.
+
 ## File and folder structure
 
 ```text
@@ -21,7 +23,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---output_clip/
 |   |---output_demo/
 |
-|---postprocessing (will be auto-generated)
+|---postprocessing/ (powershell-only / will be auto-generated)
 |   |
 |   |---clip_invalid/
 |   |---demo_invalid/
@@ -31,7 +33,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---input/
 |   |---output/
 |   
-|---serverdemo/
+|---serverdemo/ (powershell-only)
 |   |
 |   |---input/
 |   |    |
@@ -127,7 +129,7 @@ An optional feature of `extract_highlight` is the config file swapping. This fea
 
 For each mod there should be a q3config file named appropiately, for example `arena.cfg` or `osp.cfg` in the *q3cfg* folder. Only files for mods contained in `q3install.allowedGames` will be considered.
 
-## Recommended binds for viewing demos
+## Suggested binds for viewing demos
 
 ```text
 bind 1 "toggle timescale 1 0; timescale"
