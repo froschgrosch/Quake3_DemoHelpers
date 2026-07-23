@@ -4,17 +4,17 @@ A collection of tools to make the task of sorting demos and highlight clips easi
 
 The `extract_serverdemo.ps1` script uses a very slightly modified version of Chomenor's [server side recording implementation](https://github.com/Chomenor/Quake3e/tree/server_side_recording) which ignores missing pak0-pak8 files. However, the programs are independent of each other so it is not mandatory to install that binary if you do not intend to use that particular tool.
 
-It IS however required to install UDT_cutter and UDT_json to ensure functionality of all scripts. The aforementioned tools can be obtained at [myT's page](https://myt.playmorepromode.com/udt/redirections/), check *windows_console_x64* or *windows_console_x86*.
+It IS however required to install UDT_cutter and UDT_json to ensure functionality of all scripts. The aforementioned tools can be obtained at [myT's page](https://myt.playmorepromode.com/udt/redirections/), check *windows_console_x64*,  *windows_console_x86*, *linux_console_x64* or *linux_console_x86*.
+
+The scripts for extracting demos from server-side demos and for automatic post processing are currently only available in powershell.
 
 ## File and folder structure
-
-*"default.cfg" in baseq3 is to be extracted from pak0.pk3.*
 
 ```text
 |---baseq3/
 |   |
 |   |---default.cfg
-|   |---q3config_server.cfg (will be auto-generated)
+|   |---q3config_server.cfg
 |
 |---highlight/
 |   |
@@ -23,7 +23,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---output_clip/
 |   |---output_demo/
 |
-|---postprocessing (will be auto-generated)
+|---postprocessing/ (powershell-only / will be auto-generated)
 |   |
 |   |---clip_invalid/
 |   |---demo_invalid/
@@ -33,7 +33,7 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |   |---input/
 |   |---output/
 |   
-|---serverdemo/
+|---serverdemo/ (powershell-only)
 |   |
 |   |---input/
 |   |    |
@@ -59,13 +59,16 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 |
 |---zz_tools/
 |   |
-|   |---UDT_cutter.exe
-|   |---UDT_json.exe
+|   |---UDT_cutter(.exe)
+|   |---UDT_json(.exe)
 |
 |---extract_highlight.ps1
 |---extract_serverdemo.ps1
 |---rename.ps1
 |---highlight_postprocessing.ps1
+|
+|---extract_highlight.sh
+|---rename.sh
 |
 |---quake3e.ded.x64.exe
 ```
@@ -113,8 +116,8 @@ Here the different output folders are defined. `{0}` will be substituted with th
 
 #### `highlights\settings.json`
 
-| **Setting**      | **Explanation**                                                                                                                                      |
-|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Setting**      | **Explanation**                                                                                                                                    |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `defaultOffset`  | This setting defines the default clip offset (the time from when the clip starts/ends until when the clip event actually happens)                  |
 | `q3install.*`    | In this setting the quake3 install path, binary name and allowed mods are defined.                                                                 |
 | `configSwapping` | This setting decides if config swapping is enabled or not.                                                                                         |
@@ -122,23 +125,23 @@ Here the different output folders are defined. `{0}` will be substituted with th
 
 #### Config swapping
 
-An optional feature of `extract_highlight.ps1` is the config file swapping. This feature allows the user to have separate config files for viewing demo of multiple mods. Those config files will be swapped in dynamically while the script runs.
+An optional feature of `extract_highlight` is the config file swapping. This feature allows the user to have separate config files for viewing demo of multiple mods. Those config files will be swapped in dynamically while the script runs.
 
 For each mod there should be a q3config file named appropiately, for example `arena.cfg` or `osp.cfg` in the *q3cfg* folder. Only files for mods contained in `q3install.allowedGames` will be considered.
 
-## Recommended binds for viewing demos
+## Suggested binds for viewing demos
 
 ```text
-bind 1 "toggle timescale 1 0"
-bind 2 "toggle timescale 2 0"
-bind 3 "toggle timescale 5 0"
-bind 4 "toggle timescale 10 0"
-bind 5 "toggle timescale .5 0"
-bind 6 "toggle timescale .25 0"
-bind 7 "toggle timescale .1 0"
+bind 1 "toggle timescale 1 0; timescale"
+bind 2 "toggle timescale 2 0; timescale"
+bind 3 "toggle timescale 5 0; timescale"
+bind 4 "toggle timescale 10 0; timescale"
+bind 5 "toggle timescale .5 0; timescale"
+bind 6 "toggle timescale .25 0; timescale"
+bind 7 "toggle timescale .1 0; timescale"
 bind 8 "timescale 0; echo Playback paused."
 bind b "timescale 1; demo highlight_preview; echo Playback restarted."
 bind c "quit"
-bind v "toggle s_volume 0 0.1"
+bind v "toggle s_volume 0 0.1; s_volume"
 bind s "toggle r_fastsky"
 ```
