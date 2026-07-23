@@ -120,6 +120,8 @@ do
     fi
 done
 
+regex_demo='[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}_[[:digit:]]{2}-[[:digit:]]{2}-[[:digit:]]{2}_[[:alnum:]_-]+_[[:graph:]]+\.dm_68'
+
 ##  program start ##
 
 # pause before starting execution (if desired)
@@ -132,7 +134,12 @@ fi
 for file in ./highlight/input/*.dm_68; do
     file=$(basename -a $file)
 
-    # todo: check if filename matches regex
+    # check if filename is valid
+    if [[ ! $file =~ $regex_demo ]]
+    then
+        echo 'File name format is invalid!'
+        continue
+    fi
 
     # get demo data
     udtoutput=$(zz_tools/UDT_json -a=mg -c "./highlight/input/$file")
