@@ -11,8 +11,6 @@ function clear_config_files() {
         return
     fi
 
-    readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
-
     for game in "${allowedGames[@]}"; do
         # check if swap marker is present
         if [ -f "./zz_config/highlights/q3cfg/$game.swapped" ]
@@ -51,18 +49,83 @@ function get_clip_file () {
 # enable globbing (needed later)
 shopt -s extglob
 
+# check if input and output folders are empty
+ls ./highlight/input/*.dm_68 1> /dev/null 2>&1
+if [ $? -eq 2 ]
+then
+    echo 'Error: No files in input folder!'
+    exit 1
+fi
+
+ls ./highlight/output_clip/*.dm_68 1> /dev/null 2>&1
+if [ $? -eq 0 ]
+then
+    echo 'There are files in the output folder! Do you want to continue?'
+
+    select action in 'Continue' 'Quit'; do
+        case $REPLY in
+            1)
+                break
+            ;;
+
+            2)
+                exit 0
+            ;;
+        esac
+    done
+fi
+
+# check if there are any allowed mods
+if [[ $(jq -c '.q3install.allowedGames | length' ./zz_config/highlights/settings.json) -eq '0' ]]
+then
+    echo 'Error: No valid mods specified in the config file'; echo 'Please specify at least one valid mod in the config file.'
+    exit 1
+else
+    readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
+fi
+
 # read install path and executable name
 q3exec=$(jq -r '.q3install.executable' ./zz_config/highlights/settings.json)
 q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
 
+# check if q3 binary is present and is executable
+if [ ! -x "$q3path/$q3exec" ]
+then
+    echo 'Error: The Quake 3 binary is not present and executable at the specified path!'
+    exit 1
+fi
+
+# check if the mods are installed properly
+for game in "${allowedGames[@]}";
+do
+    if [ ! -d "$q3path/$game" ]
+    then
+        echo "Error: Mod ""$game"" is specified in the config file, but not present in the Quake 3 installation!"; echo 'Please install the mod or remove it from the config file.'
+        exit 1
+    else
+        # create "demos" folder in mod directory if it does not exist
+        if [ ! -d "$q3path/$game/demos" ]
+        then
+            mkdir "$q3path/$game/demos"
+        fi
+    fi
+
+    if [[ $(jq '.configSwapping' ./zz_config/highlights/settings.json) == true ]] then
+        # check if swappable config file actually exists
+        if [ ! -e "./zz_config/highlights/q3cfg/$game.cfg" ]
+        then
+            echo "Error: There is no swappable config file present for the mod ""$game""!"; echo 'Please add a swappable config file or disable config swapping.'
+            exit 1
+        fi
+    fi
+done
+
 ##  program start ##
 
-# check if input folder is empty
-ls ./highlight/input/*.dm_68 1> /dev/null 2>&1
-if [ $? -eq 2 ]
-then
-    echo 'No files in input folder! Exiting.'
-    exit 1
+# pause before starting execution (if desired)
+if [[ $(jq '.pauseAtStart' ./zz_config/highlights/settings.json) == true ]] then
+    echo 'Press enter to start.'
+    read > /dev/null
 fi
 
 # main demo loop
