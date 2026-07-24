@@ -91,7 +91,7 @@ q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
 # check if q3 binary is present and is executable
 if [ ! -x "$q3path/$q3exec" ]
 then
-    echo 'Error: The Quake 3 binary is not present and executable at the specified path!'
+    echo 'Error: The Quake 3 binary is not present and executable at the specified path!'; echo 'Please correct the path or install Quake 3 at the specified location.'
     exit 1
 fi
 
@@ -134,10 +134,12 @@ fi
 for file in ./highlight/input/*.dm_68; do
     file=$(basename -a $file)
 
+    echo "Selecting $file..."
+
     # check if filename is valid
     if [[ ! $file =~ $regex_demo ]]
     then
-        echo 'File name format is invalid!'
+        echo 'File name format is invalid!'; echo
         continue
     fi
 
@@ -156,12 +158,10 @@ for file in ./highlight/input/*.dm_68; do
         continue
     fi
 
-    echo "Selecting $file..."
-
     # skip the demo if there are no chat messages present
     if [[ $(echo "$udtoutput" | jq -c '.chat | length') -eq '0' ]]
     then
-        #echo 'Demo contains no chat messages!'; echo
+        echo 'Demo contains no chat messages!'; echo
 
         mv ./highlight/input/$file ./highlight/output_demo/
         continue
