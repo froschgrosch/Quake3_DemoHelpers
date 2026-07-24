@@ -76,12 +76,12 @@ then
 fi
 
 # check if there are any allowed mods
-if [[ $(jq -c '.q3install.allowedGames | length' ./zz_config/highlights/settings.json) -eq '0' ]]
+readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
+
+if [[ ${#allowedGames[@]} -eq '0' ]]
 then
     echo 'Error: No valid mods specified in the config file'; echo 'Please specify at least one valid mod in the config file.'
     exit 1
-else
-    readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
 fi
 
 # read install path and executable name
@@ -158,16 +158,18 @@ for file in ./highlight/input/*.dm_68; do
         continue
     fi
 
+
+
     # skip the demo if there are no chat messages present
-    if [[ $(echo "$udtoutput" | jq -c '.chat | length') -eq '0' ]]
+    readarray -t messages < <(echo "$udtoutput" | jq -c '.chat.[]' 2> /dev/null)
+
+    if [[ ${#messages[@]} -eq '0' ]]
     then
         echo 'Demo contains no chat messages!'; echo
 
         mv ./highlight/input/$file ./highlight/output_demo/
         continue
     fi
-
-    readarray -t messages < <(echo "$udtoutput" | jq -c '.chat.[]')
 
     # preprocess values
     gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
