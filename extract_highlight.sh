@@ -120,7 +120,7 @@ do
     fi
 done
 
-regex_demo='[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}_[[:digit:]]{2}-[[:digit:]]{2}-[[:digit:]]{2}_[[:alnum:]_-]+_[[:graph:]]+\.dm_68'
+regex_demo='^[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}_[[:digit:]]{2}-[[:digit:]]{2}-[[:digit:]]{2}_[[:alnum:]_-]+_[[:graph:]]+\.dm_68$'
 
 ##  program start ##
 

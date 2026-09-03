@@ -4,7 +4,7 @@
 # Licensed under GNU GPLv3. - File: rename.sh                             #
 ###########################################################################
 
-regex_q3e='[[:digit:]]{14}-[[:graph:]]+\.[[:digit:]]+-[[:alnum:]_-]+\.dm_68'
+regex_q3e='^[[:digit:]]{14}-[[:graph:]]+\.[[:digit:]]+-[[:alnum:]_-]+\.dm_68$'
 
 # check if there are files in the input folder
 ls ./rename/input/*.dm_68 1> /dev/null 2>&1
