@@ -34,6 +34,8 @@ function clear_config_files() {
 
 function get_clip_file () {
     zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
+    # todo: check return code of UDT_cutter?
+
     clipfile=$(basename -a ./highlight/temp/*.dm_68)
 
     if [ -f "$demopath" ]
@@ -44,10 +46,15 @@ function get_clip_file () {
     cp ./highlight/temp/$clipfile "$demopath"
 }
 
-## initialization ##
+function read_int () {
+    regex='^[+-]?[[:digit:]]+$'
+    number='!' # make it invalid so the loop runs at least once
+    until [[ $number =~ $regex ]]; do
+        read -p 'Enter Value (+ = later, - = earlier) ? ' 'number'
+    done
+}
 
-# enable globbing (needed later)
-shopt -s extglob
+## initialization ##
 
 # check if input and output folders are empty
 ls ./highlight/input/*.dm_68 1> /dev/null 2>&1
@@ -225,8 +232,9 @@ for file in ./highlight/input/*.dm_68; do
                         1)
                             newname=${clipfile/_CUT/}
 
+                            regex='^[[:alnum:]_-]*$'
                             suffix='!' # make it invalid so the loop runs at least once
-                            until [[ $suffix == *([a-z0-9_]) ]]; do
+                            until [[ $suffix =~ $regex ]]; do
                                 read -p 'Enter new suffix (optional) ? ' 'suffix'
                             done
 
@@ -253,11 +261,7 @@ for file in ./highlight/input/*.dm_68; do
 
                         # Adjust start time
                         4)
-                            number='a' # make it invalid so the loop runs at least once
-                            until [[ $number == ?(-|+)+([0-9]) ]]; do
-                                read -p 'Enter Value (+ = later, - = earlier) ? ' 'number'
-                            done
-
+                            read_int # todo: check if starttime is bigger than endtime, or if outside of the time range of the demo
                             starttime=$(($starttime + $number))
 
                             rm $demopath ./highlight/temp/$clipfile
@@ -268,11 +272,7 @@ for file in ./highlight/input/*.dm_68; do
                         ;;
 
                         5)
-                            number='a' # make it invalid so the loop runs at least once
-                            until [[ $number == ?(-|+)+([0-9]) ]]; do
-                                read -p 'Enter Value (+ = later, - = earlier) ? ' 'number'
-                            done
-
+                            read_int # todo: check if starttime is bigger than endtime, or if outside of the time range of the demo
                             endtime=$(($endtime + $number))
 
                             rm $demopath ./highlight/temp/$clipfile
