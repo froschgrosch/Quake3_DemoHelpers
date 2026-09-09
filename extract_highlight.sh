@@ -32,7 +32,7 @@ function clear_config_files() {
     return
 }
 
-function get_clip_file () {
+function get_clip_file() {
     zz_tools/UDT_cutter t -q -s="$starttime" -e="$endtime" -o="./highlight/temp" "./highlight/input/$file"
     # todo: check return code of UDT_cutter?
 
@@ -46,7 +46,7 @@ function get_clip_file () {
     cp ./highlight/temp/$clipfile "$demopath"
 }
 
-function read_int () {
+function read_int() {
     regex='^[+-]?[[:digit:]]+$'
     number='!' # make it invalid so the loop runs at least once
     until [[ $number =~ $regex ]]; do
@@ -83,11 +83,11 @@ then
 fi
 
 # check if there are any allowed mods
-readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json)
+readarray -t allowedGames < <(jq -rc '.q3install.allowedGames.[]' ./zz_config/highlights/settings.json 2> /dev/null)
 
 if [[ ${#allowedGames[@]} -eq '0' ]]
 then
-    echo 'Error: No valid mods specified in the config file'; echo 'Please specify at least one valid mod in the config file.'
+    echo 'Error: No mods specified in the config file'; echo 'Please specify at least one valid mod in the config file.'
     exit 1
 fi
 
@@ -147,11 +147,24 @@ for file in ./highlight/input/*.dm_68; do
     if [[ ! $file =~ $regex_demo ]]
     then
         echo 'File name format is invalid!'; echo
+
+        mv ./highlight/input/$file ./highlight/output_demo/
         continue
     fi
 
     # get demo data
     udtoutput=$(zz_tools/UDT_json -a=mg -c "./highlight/input/$file")
+
+    # check if fs_game is valid
+    gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
+
+    if [[ ! " ${allowedGames[*]} " =~ [[:space:]]${gamename}[[:space:]] ]]
+    then
+        echo "fs_game of demo is not valid ($gamename)!"
+
+        mv ./highlight/input/$file ./highlight/output_demo/
+        continue
+    fi
 
     player=$(echo "$udtoutput" | jq -r .gameStates[0].demoTakerCleanName)
 
@@ -162,10 +175,10 @@ for file in ./highlight/input/*.dm_68; do
     if [[ -z ${player} ]]
     then
         echo 'Player not found in config file!'; echo
+
+        mv ./highlight/input/$file ./highlight/output_demo/
         continue
     fi
-
-
 
     # skip the demo if there are no chat messages present
     readarray -t messages < <(echo "$udtoutput" | jq -c '.chat.[]' 2> /dev/null)
@@ -178,8 +191,8 @@ for file in ./highlight/input/*.dm_68; do
         continue
     fi
 
-    # preprocess values
-    gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
+    # demo is valid, ready for further processing
+
     demopath="$q3path/$gamename/demos/highlight_preview.dm_68"
 
     # swap config file if needed
