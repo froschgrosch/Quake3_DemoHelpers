@@ -160,7 +160,7 @@ for file in ./highlight/input/*.dm_68; do
 
     if [[ ! " ${allowedGames[*]} " =~ [[:space:]]${gamename}[[:space:]] ]]
     then
-        echo "fs_game of demo is not valid ($gamename)!"
+        echo "fs_game of demo is not valid ($gamename)!"; echo
 
         mv ./highlight/input/$file ./highlight/output_demo/
         continue
@@ -192,7 +192,6 @@ for file in ./highlight/input/*.dm_68; do
     fi
 
     # demo is valid, ready for further processing
-
     demopath="$q3path/$gamename/demos/highlight_preview.dm_68"
 
     # swap config file if needed
