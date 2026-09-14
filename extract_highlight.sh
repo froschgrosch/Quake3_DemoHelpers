@@ -224,7 +224,7 @@ for file in ./highlight/input/*.dm_68; do
             # decision loop
             while true; do
                 # play demo
-                "$q3path/$q3exec" +set fs_game "$gamename" +set fs_homepath "$q3path" +set nextdemo 'quit' +demo 'highlight_preview.dm_68' &> /dev/null
+                "$q3path/$q3exec" +set ttycon 0 +set fs_game "$gamename" +set fs_homepath "$q3path" +set nextdemo 'quit' +demo 'highlight_preview.dm_68' &> /dev/null
 
                 # select action
                 echo 'c) Quit'
