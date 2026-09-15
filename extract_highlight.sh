@@ -43,7 +43,7 @@ function get_clip_file() {
         rm "$demopath"
     fi
 
-    cp ./highlight/temp/$clipfile "$demopath"
+    cp "./highlight/temp/$clipfile" "$demopath"
 }
 
 function read_int() {
@@ -148,7 +148,7 @@ for file in ./highlight/input/*.dm_68; do
     then
         echo 'File name format is invalid!'; echo
 
-        mv ./highlight/input/$file ./highlight/output_demo/
+        mv "./highlight/input/$file" ./highlight/output_demo/
         continue
     fi
 
@@ -162,7 +162,7 @@ for file in ./highlight/input/*.dm_68; do
     then
         echo "fs_game of demo is not valid ($gamename)!"; echo
 
-        mv ./highlight/input/$file ./highlight/output_demo/
+        mv "./highlight/input/$file" ./highlight/output_demo/
         continue
     fi
 
@@ -176,7 +176,7 @@ for file in ./highlight/input/*.dm_68; do
     then
         echo 'Player not found in config file!'; echo
 
-        mv ./highlight/input/$file ./highlight/output_demo/
+        mv "./highlight/input/$file" ./highlight/output_demo/
         continue
     fi
 
@@ -187,7 +187,7 @@ for file in ./highlight/input/*.dm_68; do
     then
         echo 'Demo contains no chat messages!'; echo
 
-        mv ./highlight/input/$file ./highlight/output_demo/
+        mv "./highlight/input/$file" ./highlight/output_demo/
         continue
     fi
 
@@ -253,14 +253,14 @@ for file in ./highlight/input/*.dm_68; do
                             newname="${newname/.dm_68/}${suffix:+_$suffix}.dm_68"
 
                             #echo $newname
-                            mv ./highlight/temp/$clipfile ./highlight/output_clip/$newname
+                            mv "./highlight/temp/$clipfile" "./highlight/output_clip/$newname"
 
                             break 2 # decision loop
                         ;;
 
                         # Delete - remove file from temp folder and move on
                         2)
-                            rm ./highlight/temp/$clipfile
+                            rm "./highlight/temp/$clipfile"
 
                             break 2 # decision loop
                         ;;
@@ -276,7 +276,7 @@ for file in ./highlight/input/*.dm_68; do
                             read_int # todo: check if starttime is bigger than endtime, or if outside of the time range of the demo
                             starttime=$(($starttime + $number))
 
-                            rm $demopath ./highlight/temp/$clipfile
+                            rm "$demopath" "./highlight/temp/$clipfile"
                             get_clip_file
 
                             # the decision loop will play the new demo
@@ -287,7 +287,7 @@ for file in ./highlight/input/*.dm_68; do
                             read_int # todo: check if starttime is bigger than endtime, or if outside of the time range of the demo
                             endtime=$(($endtime + $number))
 
-                            rm $demopath ./highlight/temp/$clipfile
+                            rm "$demopath" "./highlight/temp/$clipfile"
                             get_clip_file
 
                             # the decision loop will play the new demo
@@ -298,12 +298,12 @@ for file in ./highlight/input/*.dm_68; do
             done # decision loop
 
             # clean up remaining preview file
-            rm $demopath
+            rm "$demopath"
         fi # endif the message is matching criteria
     done # message loop
 
     # move demo to output folder
-    mv ./highlight/input/$file ./highlight/output_demo/
+    mv "./highlight/input/$file" ./highlight/output_demo/
 done # file loop
 
 clear_config_files
