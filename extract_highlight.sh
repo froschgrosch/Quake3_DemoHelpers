@@ -154,6 +154,27 @@ for file in ./highlight/input/*.dm_68; do
 
     # get demo data
     udtoutput=$(zz_tools/UDT_json -a=mg -c "./highlight/input/$file")
+    if [[ $? -ne 0 ]]
+    then
+        echo "Return code of UDT_json is $?! Demo will be skipped."; echo
+
+        mv "./highlight/input/$file" ./highlight/output_demo/
+        continue
+    fi
+
+    # unfortunately, UDT_json does not exit with error code 1 when the demo is invalid.
+    # this statement checks if there is exactly one gamestate, and if there are players and configstrings in the demo
+    if [[ $(echo $udtoutput | jq '(.gameStates[].players | length == 0) or (.gameStates | length != 1) or (.gameStates[].configStringValues | length == 0)') == true ]]
+    then
+        echo 'Something is wrong with this demo file (Not exactly one gamestate, or no players or configStrings).'
+        echo; echo "UDT_json output of $file:"
+
+        echo "$udtoutput" | jq .
+        echo 'Moving to output folder.'; echo
+
+        mv "./highlight/input/$file" ./highlight/output_demo/
+        continue
+    fi
 
     # check if fs_game is valid
     gamename=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)

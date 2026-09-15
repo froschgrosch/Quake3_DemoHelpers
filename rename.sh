@@ -34,7 +34,29 @@ for file in ./rename/input/*.dm_68; do
 
     # get demo data
     udtoutput=$(zz_tools/UDT_json -a=g -c "./rename/input/$file")
+    if [[ $? -ne 0 ]]
+    then
+        echo "Return code of UDT_json is $?! Demo will be skipped."; echo
 
+        mv "./rename/input/$file" ./rename/output/
+        continue
+    fi
+
+    # unfortunately, UDT_json does not exit with error code 1 when the demo is invalid.
+    # this statement checks if there is exactly one gamestate, and if there are players and configstrings in the demo
+    if [[ $(echo $udtoutput | jq '(.gameStates[].players | length == 0) or (.gameStates | length != 1) or (.gameStates[].configStringValues | length == 0)') == true ]]
+    then
+        echo 'Something is wrong with this demo file (Not exactly one gamestate, or no players or configStrings).'
+        echo; echo "UDT_json output of $file:"
+
+        echo "$udtoutput" | jq .
+        echo 'Moving to output folder.'; echo
+
+        mv "./rename/input/$file" ./rename/output/
+        continue
+    fi
+
+    # get player
     player=$(echo "$udtoutput" | jq -r .gameStates[0].demoTakerCleanName)
 
     # select canonical name
@@ -49,3 +71,5 @@ for file in ./rename/input/*.dm_68; do
     mv ./rename/input/$file ./rename/output/$newname.dm_68
     touch -d "$(date -Rd "$y-$mn-$d $h:$m:$s")" ./rename/output/$newname.dm_68
 done
+
+echo 'Demo renaming is finished.'
