@@ -4,7 +4,7 @@ A collection of tools to make the task of sorting demos and highlight clips easi
 
 The `extract_serverdemo.ps1` script uses a very slightly modified version of Chomenor's [server side recording implementation](https://github.com/Chomenor/Quake3e/tree/server_side_recording) which ignores missing pak0-pak8 files. However, the programs are independent of each other so it is not mandatory to install that binary if you do not intend to use that particular tool.
 
-It IS however required to install UDT_cutter and UDT_json to ensure functionality of all scripts. The aforementioned tools can be obtained at [myT's page](https://myt.playmorepromode.com/udt/redirections/), check *windows_console_x64*,  *windows_console_x86*, *linux_console_x64* or *linux_console_x86*.
+It IS however required to install UDT_cutter and UDT_json to ensure functionality of all scripts. The aforementioned tools can be obtained at [myT's page](https://myt.playmorepromode.com/udt/redirections/), check *windows_console_x64*,  *windows_console_x86*, *linux_console_x64* or *linux_console_x86*. The bash scripts also require the [jq](https://jqlang.org/) utility to be installed (e.g. `sudo apt install jq` for debian-based systems).
 
 The scripts for extracting demos from server-side demos and for automatic post processing are currently only available in powershell.
 
