@@ -4,7 +4,7 @@
 # Licensed under GNU GPLv3. - File: extract_highlight.sh                  #
 ###########################################################################
 
-## function declaration ##
+## FUNCTION DECLARATION ##
 
 function clear_config_files() {
     if [[ $(jq '.configSwapping' ./zz_config/highlights/settings.json) != true ]] then
@@ -54,7 +54,34 @@ function read_int() {
     done
 }
 
-## initialization ##
+## INITIALIZATION ##
+
+# check if all external dependencies are available
+jq --version 1> /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo 'Error: jq is not available! Please refer to README.md'
+    exit 1
+fi
+
+if [ ! -x ./zz_tools/UDT_json ]; then
+    echo 'Error: UDT_json is not available at the expected path! Please refer to README.md'
+    exit 1
+fi
+
+if [ ! -x ./zz_tools/UDT_cutter ]; then
+    echo 'Error: UDT_cutter is not available at the expected path! Please refer to README.md'
+    exit 1
+fi
+
+# read q3 install path and executable name
+q3exec=$(jq -r '.q3install.executable' ./zz_config/highlights/settings.json)
+q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
+
+# check if q3 binary is present and executable
+if [ ! -x "$q3path/$q3exec" ]; then
+    echo 'Error: The Quake 3 binary is not present and executable at the specified path!'; echo 'Please correct the path or install Quake 3 at the specified location.'
+    exit 1
+fi
 
 # check if input and output folders are empty
 ls ./highlight/input/*.dm_68 1> /dev/null 2>&1
@@ -91,17 +118,6 @@ then
     exit 1
 fi
 
-# read install path and executable name
-q3exec=$(jq -r '.q3install.executable' ./zz_config/highlights/settings.json)
-q3path=$(jq -r '.q3install.path' ./zz_config/highlights/settings.json)
-
-# check if q3 binary is present and is executable
-if [ ! -x "$q3path/$q3exec" ]
-then
-    echo 'Error: The Quake 3 binary is not present and executable at the specified path!'; echo 'Please correct the path or install Quake 3 at the specified location.'
-    exit 1
-fi
-
 # check if the mods are installed properly
 for game in "${allowedGames[@]}";
 do
@@ -129,7 +145,7 @@ done
 
 regex_demo='^[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}_[[:digit:]]{2}-[[:digit:]]{2}-[[:digit:]]{2}_[[:alnum:]_-]+_[[:graph:]]+\.dm_68$'
 
-##  program start ##
+## PROGRAM START ##
 
 # pause before starting execution (if desired)
 if [[ $(jq '.pauseAtStart' ./zz_config/highlights/settings.json) == true ]] then

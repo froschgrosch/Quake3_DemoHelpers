@@ -4,7 +4,19 @@
 # Licensed under GNU GPLv3. - File: rename.sh                             #
 ###########################################################################
 
-regex_q3e='^[[:digit:]]{14}-[[:graph:]]+\.[[:digit:]]+-[[:alnum:]_-]+\.dm_68$'
+## INITIALIZATION ##
+
+# check if all external dependencies are available
+jq --version 1> /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo 'Error: jq is not available! Please refer to README.md'
+    exit 1
+fi
+
+if [ ! -x ./zz_tools/UDT_json ]; then
+    echo 'Error: UDT_json is not available at the expected path! Please refer to README.md'
+    exit 1
+fi
 
 # check if there are files in the input folder
 ls ./rename/input/*.dm_68 1> /dev/null 2>&1
@@ -13,6 +25,10 @@ then
     echo 'Error: No valid files in input folder!'
     exit 1
 fi
+
+regex_q3e='^[[:digit:]]{14}-[[:graph:]]+\.[[:digit:]]+-[[:alnum:]_-]+\.dm_68$'
+
+## PROGRAM START ##
 
 for file in ./rename/input/*.dm_68; do
     file=$(basename -a $file)
