@@ -8,6 +8,45 @@ It IS however required to install UDT_cutter and UDT_json to ensure functionalit
 
 The scripts for extracting demos from server-side demos and for automatic post processing are currently only available in powershell.
 
+## Basic Workflow (Quick Start)
+
+All external dependencies for the scripts that you intend to use need to be installed before demo processing can start.
+It is also required to create the folder structure as detailed in the file and folder structure section (e.g. highlight, serverdemo, rename, postprocessing etc...).
+Take a look at the supplied configuration files and check what needs to be changed to fit your requirements.
+
+After successful installation, it is possible to bulk process various types of demos as follows:
+
+### Starting from a server-side recorded demo (powershell-only)
+
+When you have recorded server-side demos, the script expects you to copy the whole folder structure from the server-side `records` folder, e.g. `records/2025-04-21/20-30-58-ra3map1.rec` so that the parent `2025-04-21` folder sits inside the local input folder.
+
+1. Put serverdemo folders in `serverdemo/input/`.
+2. Invoke `extract_serverdemo.ps1`.
+3. Examine output files and choose what to keep.
+4. Put freshly extracted demos into `extract_highlight/input` and continue at section *Extracting highlights*.
+
+### Starting from Quake3e-style named demos
+
+1. Put demo files in `rename/input/`.
+2. Invoke `rename.ps1` or `rename.sh`.
+3. Put freshly renamed demos into `extract_highlight/input` and continue at section  *Extracting highlights*.
+
+### Extracting highlights from renamed/extracted demos
+
+1. Verify that the correct files are in the input folder `extract_highlight/input`.
+2. Invoke `extract_highlight.ps1` or `extract_highlight.sh`.
+3. Look at each extracted clip and decide what to do.
+4. The processed files can be found in `extract_highlight/output_clip` and `extract_highlight/output_demo`, respectively.
+5. *(Optional, powershell-only)*: Continue at section *Auto-move demos*.
+
+### Auto-move demos to archival folder (powershell-only)
+
+After configuring the output paths *(see section* postprocessing\settings.json*)* this script will move all demo and clip files to the correct folder, while continuing at the last valid clip number.
+
+1. Invoke `highlight_postprocessing.ps1`
+2. The clips and demos will have moved to their respective output folders.
+3. Any invalid files will be put in the `postprocessing/` folder to be retrieved by the user.
+
 ## File and folder structure
 
 ```text
