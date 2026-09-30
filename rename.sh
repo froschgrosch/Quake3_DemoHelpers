@@ -26,7 +26,7 @@ then
     exit 1
 fi
 
-regex_q3e='^[[:digit:]]{14}-[[:graph:]]+\.[[:digit:]]+-[[:alnum:]_-]+\.dm_68$'
+regex_q3e='^[[:digit:]]{14}-(([[:graph:]]+\.[[:digit:]]+)|localhost)+-[[:alnum:]_-]+\.dm_68$'
 
 ## PROGRAM START ##
 
